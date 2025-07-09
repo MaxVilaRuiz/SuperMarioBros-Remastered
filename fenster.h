@@ -34,3 +34,13 @@ struct fenster {
 #endif
 };
 #endif /* FENSTER_H */
+
+#ifndef FENSTER_API
+#define FENSTER_API extern
+#endif
+FENSTER_API int     fenster_open(struct fenster *f);
+FENSTER_API int     fenster_loop(struct fenster *f);
+FENSTER_API void    fenster_close(struct fenster *f);
+FENSTER_API void    fenster_sleep(int64_t ms);
+FENSTER_API int64_t fenster_time(void);
+#define fenster_pixel(f, x, y) ((f)->buf[((y) * (f)->width) + (x)])
