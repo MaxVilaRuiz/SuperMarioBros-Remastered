@@ -56,6 +56,32 @@ FENSTER_API int64_t fenster_time(void);
 
 #define cls(x) ((id)objc_getClass(x))
 
-#endif
+extern id const NSDefaultRunLoopMode;
+extern id const NSApp;
+
+static void fenster_draw_rect(id v, SEL s, CGRect r) {
+    (void)r, (void)s;
+    struct fenster *f = (struct fenster *)objc_getAssociatedObject(v, "fenster");
+    CGContextRef    context =
+        msg(CGContextRef, msg(id, cls("NSGraphicsContext"), "currentContext"), "graphicsPort");
+    CGColorSpaceRef   space = CGColorSpaceCreateDeviceRGB();
+    CGDataProviderRef provider =
+        CGDataProviderCreateWithData(NULL, f->buf, f->width * f->height * 4, NULL);
+    CGImageRef img = CGImageCreate(f->width, f->height, 8, 32, f->width * 4, space,
+                                   kCGImageAlphaNoneSkipFirst | kCGBitmapByteOrder32Little,
+                                   provider, NULL, false, kCGRenderingIntentDefault);
+    CGColorSpaceRelease(space);
+    CGDataProviderRelease(provider);
+    CGContextDrawImage(context, CGRectMake(0, 0, f->width, f->height), img);
+    CGImageRelease(img);
+}
+
+static BOOL fenster_should_close(id v, SEL s, id w) {
+    (void)v, (void)s, (void)w;
+    msg1(void, NSApp, "terminate:", id, NSApp);
+    return YES;
+}
+
+#endif /* ERASE */
 #endif /* !FENSTER_HEADER */
 #endif /* FENSTER_H */
