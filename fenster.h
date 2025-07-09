@@ -33,7 +33,6 @@ struct fenster {
     XImage  *img;
 #endif
 };
-#endif /* FENSTER_H */
 
 #ifndef FENSTER_API
 #define FENSTER_API extern
@@ -44,3 +43,19 @@ FENSTER_API void    fenster_close(struct fenster *f);
 FENSTER_API void    fenster_sleep(int64_t ms);
 FENSTER_API int64_t fenster_time(void);
 #define fenster_pixel(f, x, y) ((f)->buf[((y) * (f)->width) + (x)])
+
+#ifndef FENSTER_HEADER
+#if defined(__APPLE__)
+#define msg(r, o, s) ((r(*)(id, SEL))objc_msgSend)(o, sel_getUid(s))
+#define msg1(r, o, s, A, a) ((r(*)(id, SEL, A))objc_msgSend)(o, sel_getUid(s), a)
+#define msg2(r, o, s, A, a, B, b) ((r(*)(id, SEL, A, B))objc_msgSend)(o, sel_getUid(s), a, b)
+#define msg3(r, o, s, A, a, B, b, C, c) \
+    ((r(*)(id, SEL, A, B, C))objc_msgSend)(o, sel_getUid(s), a, b, c)
+#define msg4(r, o, s, A, a, B, b, C, c, D, d) \
+    ((r(*)(id, SEL, A, B, C, D))objc_msgSend)(o, sel_getUid(s), a, b, c, d)
+
+#define cls(x) ((id)objc_getClass(x))
+
+#endif
+#endif /* !FENSTER_HEADER */
+#endif /* FENSTER_H */
