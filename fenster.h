@@ -210,6 +210,45 @@ static LRESULT CALLBACK fenster_wndproc(HWND hwnd, UINT msg, WPARAM wParam, LPAR
     return 0;
 }
 
+FENSTER_API int fenster_open(struct fenster *f) {
+    HINSTANCE  hInstance = GetModuleHandle(NULL);
+    WNDCLASSEX wc = {0};
+    wc.cbSize = sizeof(WNDCLASSEX);
+    wc.style = CS_VREDRAW | CS_HREDRAW;
+    wc.lpfnWndProc = fenster_wndproc;
+    wc.hInstance = hInstance;
+    wc.lpszClassName = f->title;
+    RegisterClassEx(&wc);
+    f->hwnd =
+        CreateWindowEx(WS_EX_CLIENTEDGE, f->title, f->title, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT,
+                       CW_USEDEFAULT, f->width, f->height, NULL, NULL, hInstance, NULL);
+
+    if (f->hwnd == NULL) {
+        return -1;
+    }
+    SetWindowLongPtr(f->hwnd, GWLP_USERDATA, (LONG_PTR)f);
+    ShowWindow(f->hwnd, SW_NORMAL);
+    UpdateWindow(f->hwnd);
+    return 0;
+}
+
+FENSTER_API void fenster_close(struct fenster *f) {
+    (void)f;
+}
+
+FENSTER_API int fenster_loop(struct fenster *f) {
+    MSG msg;
+    while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+        if (msg.message == WM_QUIT) {
+            return -1;
+        }
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+    InvalidateRect(f->hwnd, NULL, TRUE);
+    return 0;
+}
+
 #endif /* ERASE */
 #endif /* !FENSTER_HEADER */
 #endif /* FENSTER_H */
