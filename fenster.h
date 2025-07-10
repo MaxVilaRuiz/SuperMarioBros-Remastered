@@ -6,6 +6,13 @@
 #include <objc/NSObjCRuntime.h>
 #include <objc/objc-runtime.h>
 #elif defined(_WIN32)
+#include <windows.h>
+#else
+#define _DEFAULT_SOURCE 1
+#include <X11/XKBlib.h>
+#include <X11/Xlib.h>
+#include <X11/keysym.h>
+#include <time.h>
 #endif
 
 #include <stdint.h>
@@ -151,7 +158,6 @@ FENSTER_API int fenster_loop(struct fenster *f) {
     msg1(void, NSApp, "sendEvent:", id, ev);
     return 0;
 }
-
 #elif defined(_WIN32)
 // clang-format off
 static const uint8_t FENSTER_KEYCODES[] = {0,27,49,50,51,52,53,54,55,56,57,48,45,61,8,9,81,87,69,82,84,89,85,73,79,80,91,93,10,0,65,83,68,70,71,72,74,75,76,59,39,96,0,92,90,88,67,86,66,78,77,44,46,47,0,0,0,32,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,17,3,0,20,0,19,0,5,18,4,26,127};
@@ -248,7 +254,6 @@ FENSTER_API int fenster_loop(struct fenster *f) {
     InvalidateRect(f->hwnd, NULL, TRUE);
     return 0;
 }
-
 #else
 // clang-format off
 static int FENSTER_KEYCODES[124] = {XK_BackSpace,8,XK_Delete,127,XK_Down,18,XK_End,5,XK_Escape,27,XK_Home,2,XK_Insert,26,XK_Left,20,XK_Page_Down,4,XK_Page_Up,3,XK_Return,10,XK_Right,19,XK_Tab,9,XK_Up,17,XK_apostrophe,39,XK_backslash,92,XK_bracketleft,91,XK_bracketright,93,XK_comma,44,XK_equal,61,XK_grave,96,XK_minus,45,XK_period,46,XK_semicolon,59,XK_slash,47,XK_space,32,XK_a,65,XK_b,66,XK_c,67,XK_d,68,XK_e,69,XK_f,70,XK_g,71,XK_h,72,XK_i,73,XK_j,74,XK_k,75,XK_l,76,XK_m,77,XK_n,78,XK_o,79,XK_p,80,XK_q,81,XK_r,82,XK_s,83,XK_t,84,XK_u,85,XK_v,86,XK_w,87,XK_x,88,XK_y,89,XK_z,90,XK_0,48,XK_1,49,XK_2,50,XK_3,51,XK_4,52,XK_5,53,XK_6,54,XK_7,55,XK_8,56,XK_9,57};
@@ -339,6 +344,47 @@ FENSTER_API int64_t fenster_time(void) {
     return time.tv_sec * 1000 + (time.tv_nsec / 1000000);
 }
 #endif
+
+#ifdef __cplusplus
+class Fenster {
+    struct fenster f;
+    int64_t        now;
+
+   public:
+    Fenster(const int w, const int h, const char *title)
+        : f{.title = title, .width = w, .height = h} {
+        this->f.buf = new uint32_t[w * h];
+        this->now = fenster_time();
+        fenster_open(&this->f);
+    }
+
+    ~Fenster() {
+        fenster_close(&this->f);
+        delete[] this->f.buf;
+    }
+
+    bool loop(const int fps) {
+        int64_t t = fenster_time();
+        if (t - this->now < 1000 / fps) {
+            fenster_sleep(t - now);
+        }
+        this->now = t;
+        return fenster_loop(&this->f) == 0;
+    }
+
+    inline uint32_t& px(const int x, const int y) { return fenster_pixel(&this->f, x, y); }
+
+    bool key(int c) { return c >= 0 && c < 128 ? this->f.keys[c] : false; }
+
+    int x() { return this->f.x; }
+
+    int y() { return this->f.y; }
+
+    int mouse() { return this->f.mouse; }
+
+    int mod() { return this->f.mod; }
+};
+#endif /* __cplusplus */
 
 #endif /* !FENSTER_HEADER */
 #endif /* FENSTER_H */
