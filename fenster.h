@@ -278,6 +278,41 @@ FENSTER_API void fenster_close(struct fenster *f) {
     XCloseDisplay(f->dpy);
 }
 
-#endif /* ERASE */
+FENSTER_API int fenster_loop(struct fenster *f) {
+    XEvent ev;
+    XPutImage(f->dpy, f->w, f->gc, f->img, 0, 0, 0, 0, f->width, f->height);
+    XFlush(f->dpy);
+    while (XPending(f->dpy)) {
+        XNextEvent(f->dpy, &ev);
+        switch (ev.type) {
+            case ButtonPress:
+            case ButtonRelease:
+                f->mouse = (ev.type == ButtonPress);
+                break;
+            case MotionNotify:
+                f->x = ev.xmotion.x, f->y = ev.xmotion.y;
+                break;
+            case KeyPress:
+            case KeyRelease: {
+                int m = ev.xkey.state;
+                int k = XkbKeycodeToKeysym(f->dpy, ev.xkey.keycode, 0, 0);
+                for (unsigned int i = 0; i < 124; i += 2) {
+                    if (FENSTER_KEYCODES[i] == k) {
+                        f->keys[FENSTER_KEYCODES[i + 1]] = (ev.type == KeyPress);
+                        break;
+                    }
+                }
+                f->mod = (!!(m & ControlMask)) | (!!(m & ShiftMask) << 1) |
+                         (!!(m & Mod1Mask) << 2) | (!!(m & Mod4Mask) << 3);
+                break;
+            }
+            case ClientMessage:
+                return -1;
+        }
+    }
+    return 0;
+}
+#endif
+
 #endif /* !FENSTER_HEADER */
 #endif /* FENSTER_H */
