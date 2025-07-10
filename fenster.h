@@ -113,6 +113,50 @@ FENSTER_API void fenster_close(struct fenster *f) {
     msg(void, f->wnd, "close");
 }
 
+// clang-format off
+static const uint8_t FENSTER_KEYCODES[128] = {65,83,68,70,72,71,90,88,67,86,0,66,81,87,69,82,89,84,49,50,51,52,54,53,61,57,55,45,56,48,93,79,85,91,73,80,10,76,74,39,75,59,92,44,47,78,77,46,9,32,96,8,0,27,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,26,2,3,127,0,5,0,4,0,20,19,18,17,0};
+// clang-format on
+
+FENSTER_API int fenster_loop(struct fenster *f) {
+    msg1(void, msg(id, f->wnd, "contentView"), "setNeedsDisplay:", BOOL, YES);
+    id ev = msg4(id, NSApp, "nextEventMatchingMask:untilDate:inMode:dequeue:", NSUInteger,
+                 NSUIntegerMax, id, NULL, id, NSDefaultRunLoopMode, BOOL, YES);
+    if (!ev) {
+        return 0;
+    }
+    NSUInteger evtype = msg(NSUInteger, ev, "type");
+    switch (evtype) {
+        case 1: /* NSEventTypeMouseDown */
+            f->mouse |= 1;
+            break;
+        case 2: /* NSEventTypeMouseUp*/
+            f->mouse &= ~1;
+            break;
+        case 5:
+        case 6: { /* NSEventTypeMouseMoved */
+            CGPoint xy = msg(CGPoint, ev, "locationInWindow");
+            f->x = (int)xy.x;
+            f->y = (int)(f->height - xy.y);
+            return 0;
+        }
+        case 10: /*NSEventTypeKeyDown*/
+        case 11: /*NSEventTypeKeyUp:*/ {
+            NSUInteger k = msg(NSUInteger, ev, "keyCode");
+            f->keys[k < 127 ? FENSTER_KEYCODES[k] : 0] = evtype == 10;
+            NSUInteger mod = msg(NSUInteger, ev, "modifierFlags") >> 17;
+            f->mod = (mod & 0xc) | ((mod & 1) << 1) | ((mod >> 1) & 1);
+            return 0;
+        }
+    }
+    msg1(void, NSApp, "sendEvent:", id, ev);
+    return 0;
+}
+
+#elif defined(_WIN32)
+// clang-format off
+static const uint8_t FENSTER_KEYCODES[] = {0,27,49,50,51,52,53,54,55,56,57,48,45,61,8,9,81,87,69,82,84,89,85,73,79,80,91,93,10,0,65,83,68,70,71,72,74,75,76,59,39,96,0,92,90,88,67,86,66,78,77,44,46,47,0,0,0,32,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,17,3,0,20,0,19,0,5,18,4,26,127};
+// clang-format on
+
 #endif /* ERASE */
 #endif /* !FENSTER_HEADER */
 #endif /* FENSTER_H */
