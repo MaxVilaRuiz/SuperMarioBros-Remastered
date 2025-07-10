@@ -314,5 +314,31 @@ FENSTER_API int fenster_loop(struct fenster *f) {
 }
 #endif
 
+#ifdef _WIN32
+FENSTER_API void fenster_sleep(int64_t ms) {
+    Sleep(ms);
+}
+
+FENSTER_API int64_t fenster_time() {
+    LARGE_INTEGER freq, count;
+    QueryPerformanceFrequency(&freq);
+    QueryPerformanceCounter(&count);
+    return (int64_t)(count.QuadPart * 1000.0 / freq.QuadPart);
+}
+#else
+FENSTER_API void fenster_sleep(int64_t ms) {
+    struct timespec ts;
+    ts.tv_sec = ms / 1000;
+    ts.tv_nsec = (ms % 1000) * 1000000;
+    nanosleep(&ts, NULL);
+}
+
+FENSTER_API int64_t fenster_time(void) {
+    struct timespec time;
+    clock_gettime(CLOCK_REALTIME, &time);
+    return time.tv_sec * 1000 + (time.tv_nsec / 1000000);
+}
+#endif
+
 #endif /* !FENSTER_HEADER */
 #endif /* FENSTER_H */
