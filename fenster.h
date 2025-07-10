@@ -82,6 +82,37 @@ static BOOL fenster_should_close(id v, SEL s, id w) {
     return YES;
 }
 
+FENSTER_API int fenster_open(struct fenster *f) {
+    msg(id, cls("NSApplication"), "sharedApplication");
+    msg1(void, NSApp, "setActivationPolicy:", NSInteger, 0);
+    f->wnd = msg4(id, msg(id, cls("NSWindow"), "alloc"),
+                  "initWithContentRect:styleMask:backing:defer:", CGRect,
+                  CGRectMake(0, 0, f->width, f->height), NSUInteger, 3, NSUInteger, 2, BOOL, NO);
+    Class windelegate = objc_allocateClassPair((Class)cls("NSObject"), "FensterDelegate", 0);
+    class_addMethod(windelegate, sel_getUid("windowShouldClose:"), (IMP)fenster_should_close,
+                    "c@:@");
+    objc_registerClassPair(windelegate);
+    msg1(void, f->wnd, "setDelegate:", id, msg(id, msg(id, (id)windelegate, "alloc"), "init"));
+    Class c = objc_allocateClassPair((Class)cls("NSView"), "FensterView", 0);
+    class_addMethod(c, sel_getUid("drawRect:"), (IMP)fenster_draw_rect, "i@:@@");
+    objc_registerClassPair(c);
+
+    id v = msg(id, msg(id, (id)c, "alloc"), "init");
+    msg1(void, f->wnd, "setContentView:", id, v);
+    objc_setAssociatedObject(v, "fenster", (id)f, OBJC_ASSOCIATION_ASSIGN);
+
+    id title = msg1(id, cls("NSString"), "stringWithUTF8String:", const char *, f->title);
+    msg1(void, f->wnd, "setTitle:", id, title);
+    msg1(void, f->wnd, "makeKeyAndOrderFront:", id, nil);
+    msg(void, f->wnd, "center");
+    msg1(void, NSApp, "activateIgnoringOtherApps:", BOOL, YES);
+    return 0;
+}
+
+FENSTER_API void fenster_close(struct fenster *f) {
+    msg(void, f->wnd, "close");
+}
+
 #endif /* ERASE */
 #endif /* !FENSTER_HEADER */
 #endif /* FENSTER_H */
