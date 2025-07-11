@@ -12,6 +12,13 @@
 namespace pro2 {
 
 /**
+ * @enum ModKey
+ *
+ * Enumerado para las 4 teclas de control: Ctrl, Shift, Alt, y Meta.
+ */
+enum ModKey { Ctrl = 1, Shift = 2, Alt = 4, Meta = 8 };
+
+/**
  * @enum Colors
  *
  * Enumerado de colores con los colores más simples (los 8 colores de la paleta EGA).
