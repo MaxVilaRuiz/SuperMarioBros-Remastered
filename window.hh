@@ -44,7 +44,6 @@ const Color orange = 0xff9f00;
 const Color golden = 0xffb200;
 const Color taupe = 0x7f8cAA;
 const Color purple = 0xb33791;
-}  // namespace pro2
 
 /**
  * @enum Keys
@@ -75,5 +74,75 @@ enum Keys {
     Right = 19,
     Left = 20,
 };
+
+/**
+ * @class Window
+ *
+ * La clase `Window` permite abrir ventanas en modo gráfico en Linux, MacOS y Windows. Tiene unos
+ * pocos métodos que permiten hacer programas simples que muestran gráficos, como pequeños juegos o
+ * editores.
+ */
+class Window {
+    private:
+       /**
+        * @brief La estructura de datos que Fenster necesita para trabajar
+        */
+       int     last_keys_[256];
+       int     last_mouse_;
+       fenster fenster_;
+   
+       /**
+        * @brief El buffer de pixels que se reserva como zona de pintado
+        *
+        * Cada pixel tiene 32bits, o 4 bytes, y los 3 bytes de menos peso son los valores (entre 0 y
+        * 255) de los canales R, G y B (red, green y blue).
+        */
+       uint32_t *pixels_;
+   
+       /**
+        * @brief Tamaño del buffer en bytes
+        */
+       size_t pixels_size_;
+   
+       /**
+        * @brief Parámetro de `zoom` para esta ventana
+        */
+       int zoom_ = 1;
+   
+       /**
+        * @brief Instance del último fotograma (epoch)
+        */
+       int64_t last_time_;
+   
+       /**
+        * @brief Contador de frames (o fotogramas)
+        */
+       int frame_count_ = 0;
+   
+       /**
+        * @brief Fotogramas por segundo (FPS)
+        */
+       uint8_t fps_ = 60;
+   
+       // Cámara
+       // TODO
+   
+       /**
+        * @brief Este método actualiza la cámara en función de la velocidad.
+        */
+       void update_camera_();
+   
+       /**
+        * @brief Determina si la cámara está en movimiento (su posición final es distinta de la
+        * actual).
+        */
+        // TODO
+   
+       /**
+        * @brief Constante de la velocidad a la que la cámara se desplaza a la nueva posición.
+        */
+       static constexpr int camera_speed_ = 8;
+};
+}  // namespace pro2
 
 #endif
