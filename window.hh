@@ -46,4 +46,34 @@ const Color taupe = 0x7f8cAA;
 const Color purple = 0xb33791;
 }  // namespace pro2
 
+/**
+ * @enum Keys
+ *
+ * Enumerado con los códigos de las teclas que se pueden pasar al método `Window::is_key_down`
+ * para consultar el estado de una tecla.
+ */
+enum Keys {
+    Space = 32,
+    Backspace = 8,
+    Delete = 127,
+    End = 5,
+    Escape = 27,
+    Home = 2,
+    Insert = 26,
+    PageDown = 4,
+    PageUp = 3,
+    Return = 10,
+    Tab = 9,
+    W = 87,
+    A = 65,
+    S = 83,
+    D = 68,
+    P = 80,
+    // Arrows:
+    Up = 17,
+    Down = 18,
+    Right = 19,
+    Left = 20,
+};
+
 #endif
