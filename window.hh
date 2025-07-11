@@ -142,6 +142,33 @@ class Window {
         * @brief Constante de la velocidad a la que la cámara se desplaza a la nueva posición.
         */
        static constexpr int camera_speed_ = 8;
+
+       public:
+       /**
+        * @brief Contruye una ventana con título, anchura y altura.
+        *
+        * El constructor abre una ventana, y el destructor la cierra.
+        *
+        * El parámetro `zoom` permite visualizar con más comodidad contenido pixelado. Con `zoom = 1`
+        * cada pixel de la ventana se corresponde con un pixel de la pantalla. Con `zoom = 3`, cada
+        * píxel de la ventana se convierte en un cuadrado de 3x3 píxeles en la ventana.
+        *
+        * @param title El título de la ventana (un literal de cadena de caracteres)
+        * @param width El ancho de la ventana en píxels.
+        * @param height El alto de la ventana en píxels.
+        * @param zoom El factor de aumento de cada píxel. (Es opcional, si no hay 4o parámetro toma
+        * valor 1)
+        */
+       Window(std::string title, int width, int height, int zoom = 1);
+   
+       /**
+        * @brief Destruye una ventana, es decir, cierra la ventana abierta en el constructor.
+        *
+        */
+       ~Window() {
+           fenster_close(&fenster_);
+           delete[] pixels_;
+       }
 };
 }  // namespace pro2
 
