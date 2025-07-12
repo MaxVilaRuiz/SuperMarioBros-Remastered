@@ -169,6 +169,22 @@ class Window {
            fenster_close(&fenster_);
            delete[] pixels_;
        }
+
+           /**
+     * @brief Devuelve el ancho de la ventana.
+     *
+     */
+    int width() const {
+        return fenster_.width / zoom_;
+    }
+
+    /**
+     * @brief Devuelve el alto de la ventana.
+     *
+     */
+    int height() const {
+        return fenster_.height / zoom_;
+    }
 };
 }  // namespace pro2
 
