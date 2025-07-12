@@ -305,6 +305,57 @@ class Window {
     bool was_key_pressed(int code) const {
         return code >= 0 && code < 128 && !last_keys_[code] && fenster_.keys[code];
     }
+
+        /**
+     * @brief Determina si cierta tecla de control se presionó entre el fotograma anterior y el
+     * actual
+     *
+     * Método análogo a `is_key_down` pero para las teclas de control siguientes: Ctrl, Alt,
+     * Shift y Meta. Hay un enumerado de nombre `ModKey` con las 4 teclas: `ModKey::Ctrl`,
+     * `ModKey::Alt`, `ModKey::Shift`, y `ModKey::Meta`.
+     *
+     * @param key La tecla de la que se quiere consultar el estado.
+     *
+     * @returns `true` si el estado de la tecla era "presionado" al entrar al fotograma actual.
+     * 
+     */
+    bool is_modkey_down(ModKey key) const {
+        return fenster_.mod & uint8_t(key);
+    }
+
+    /**
+     * @brief Determina si el botón izquierdo quedó en estado clicado en el fotograma anterior.
+     *
+     * Este método se comporta como `is_key_down`, consulta la documentación de `is_key_down`
+     * para saber cómo opera.
+     *
+     * @returns `true` si el botón del ratón quedó clicado al final del fotograma actual.
+     * 
+     */
+    bool is_mouse_down() const {
+        return bool(fenster_.mouse);
+    }
+
+    /**
+     * @brief Determina si el botón izquierdo del ratón se clicó entre el fotograma anterior y el
+     * actual.
+     *
+     * Este método se comporta como `was_key_pressed`, consulta la documentación de
+     * `was_key_pressed` para saber cómo opera.
+     *
+     * @returns `true` si el botón del ratón se clicó entre el fotograma anterior y el actual.
+     */
+    bool was_mouse_pressed() const {
+        return !last_mouse_ && bool(fenster_.mouse);
+    }
+
+    /**
+     * @brief Devuelve la posición del cursor del ratón.
+     *
+     * @returns Una tupla de tipo `Pt`, con campos `x` e `y`, que se corresponden con las
+     * coordenadas de la posición del ratón.
+     */
+    // Pt mouse_pos() const; // TODO
 };
 }  // namespace pro2
 
