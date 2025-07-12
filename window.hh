@@ -425,6 +425,69 @@ class Window {
         assert(fps > 0 && fps < 240);
         fps_ = fps;
     }
+
+        /**
+     * @brief Indica que la posición de la esquina superior izquierda de la ventana debería moverse
+     * según el vector `desplazamiento`.
+     *
+     * La cámara no se mueve instantáneamente, sino que se desplaza a la nueva posición a una
+     * velocidad constante.
+     *
+     * @param desplazamiento Vector de desplazamiento
+     */
+    // TODO
+    // void move_camera(Pt desplazamiento) {
+    //     if (!camera_moving_()) {
+    //         topleft_target_.x = topleft_.x + desplazamiento.x;
+    //         topleft_target_.y = topleft_.y + desplazamiento.y;
+    //     }
+    // }
+
+    /**
+     * @brief Devuelve la posición del centro de la cámara.
+     *
+     * @returns Un `Pt` con las coordenadas del centro de la cámara.
+     */
+    // TOOD
+    // Pt camera_center() const {
+    //     const int width = fenster_.width / zoom_;
+    //     const int height = fenster_.height / zoom_;
+    //     return {topleft_.x + width / 2, topleft_.y + height / 2};
+    // }
+
+    // TODO
+    // Rect camera_rect() const {
+    //     const int width = fenster_.width / zoom_;
+    //     const int height = fenster_.height / zoom_;
+    //     const int left = topleft_.x;
+    //     const int top = topleft_.y;
+    //     const int right = topleft_.x + width;
+    //     const int bottom = topleft_.y + height;
+    //     return {left, top, right, bottom};
+    // }
+
+    /**
+     * @brief Establece la posición de la esquina superior izquierda de la cámara.
+     *
+     * Este método mueve la cámara instantáneamente a la nueva posición.Alt
+     *
+     * @param topleft La nueva posición absoluta de la cámara, que se aplica instantáneamente.
+     */
+    // TODO
+    // void set_camera_topleft(Pt topleft) {
+    //     topleft_ = topleft;
+    //     topleft_target_ = topleft;
+    // }
+
+    /**
+     * @brief Devuelve la posición de la esquina superior izquierda de la cámara.
+     *
+     * @returns Un `Pt` con las coordenadas de la esquina superior izquierda de la cámara.
+     */
+    // TODO
+    // Pt topleft() const {
+    //     return topleft_;
+    // }
 };
 }  // namespace pro2
 
