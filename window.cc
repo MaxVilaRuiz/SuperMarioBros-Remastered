@@ -55,4 +55,39 @@ void Window::clear(Color color) {
         pixels_[i] = color;
     }
 }
+
+// TODO
+// Pt Window::mouse_pos() const {
+//     const int width = fenster_.width / zoom_;
+//     const int height = fenster_.height / zoom_;
+
+//     int x = fenster_.x / zoom_;
+//     int y = fenster_.y / zoom_;
+//     if (x >= width) {
+//         x = width - 1;
+//     } else if (x < 0) {
+//         x = 0;
+//     }
+//     if (y >= height) {
+//         y = height - 1;
+//     } else if (y < 0) {
+//         y = 0;
+//     }
+
+//     return Pt{x + topleft_.x, y + topleft_.y};
+// }
+
+// TODO
+// void Window::set_pixel(Pt pt, Color color) {
+//     const Pt camera_pt = {pt.x - topleft_.x, pt.y - topleft_.y};
+//     for (int i = 0; i < zoom_; i++) {
+//         for (int j = 0; j < zoom_; j++) {
+//             const int _i = camera_pt.x * zoom_ + i;
+//             const int _j = camera_pt.y * zoom_ + j;
+//             if (_i >= 0 && _i < fenster_.width && _j >= 0 && _j < fenster_.height) {
+//                 fenster_pixel(&fenster_, _i, _j) = color;
+//             }
+//         }
+//     }
+// }
 }
