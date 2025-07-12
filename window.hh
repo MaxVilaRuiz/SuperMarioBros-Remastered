@@ -253,6 +253,58 @@ class Window {
     int frame_count() const {
         return frame_count_;
     }
+
+        /**
+     * @brief Determina si cierta tecla estuvo presionada en el fotograma anterior
+     *
+     * El método `next_frame` recoge todas los eventos de teclado y ratón que han ocurrido desde la
+     * llamada anterior a `next_frame` (o desde la creación de la ventana) y mantiene el estado de
+     * todas las teclas y botones del ratón fijo durante el fotograma actual. Así pues, el método
+     * `is_key_down` simplemente consulta ese estado, que se mantiene fijo hasta la siguiente
+     * llamada a `next_frame`.
+     *
+     * Ejemplo:
+     * ```c++
+     * if (window.is_key_down('S')) { ... }
+     * if (window.is_key_down('1')) { ... }
+     * if (window.is_key_down(Key::Escape)) { ... }
+     * ```
+     *
+     * @param code El código de la tecla de la que se quiere saber si estaba presionada. El código
+     * de la letra es, o bien el código ASCII de la letra mayúscula correspondiente, el código ASCII
+     * del dígito correspondiente, o bien uno de los valores del `enum` `Key`, que recoge las teclas
+     * más típicas, incluyendo flechas, return, esc, tab, etc.
+     *
+     * @returns `true` cuando la tecla `code` estaba presionada al empezar el fotograma actual.
+     * 
+     */
+    bool is_key_down(int code) const {
+        return code >= 0 && code < 128 && fenster_.keys[code];
+    }
+
+    /**
+     * @brief Determina si cierta tecla se presionó entre el fotograma anterior y el actual
+     *
+     * (En el método `is_key_down` se explica mejor el funcionamiento de los eventos.)
+     *
+     * Ejemplo:
+     * ```c++
+     * if (window.was_key_pressed('S')) { ... }
+     * if (window.was_key_pressed('1')) { ... }
+     * if (window.was_key_pressed(Key::Escape)) { ... }
+     * ```
+     *
+     * @param code El código de la tecla de la que se quiere saber si estaba presionada. El código
+     * de la letra es, o bien el código ASCII de la letra mayúscula correspondiente, el código ASCII
+     * del dígito correspondiente, o bien uno de los valores del `enum` `Key`, que recoge las teclas
+     * más típicas, incluyendo flechas, return, esc, tab, etc.
+     *
+     * @returns `true` cuando la tecla `code` estaba presionada al empezar el fotograma actual.
+     * 
+     */
+    bool was_key_pressed(int code) const {
+        return code >= 0 && code < 128 && !last_keys_[code] && fenster_.keys[code];
+    }
 };
 }  // namespace pro2
 
