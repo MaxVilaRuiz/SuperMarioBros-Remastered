@@ -356,6 +356,75 @@ class Window {
      * coordenadas de la posición del ratón.
      */
     // Pt mouse_pos() const; // TODO
+
+        /**
+     * @brief Espera que pase un número `ms` de milisegundos sin hacer nada.
+     *
+     * En ese intervalo de tiempo el programa estará esperando que el método vuelva de la llamada, y
+     * por tanto no se ejecutará ninguna instrucción.
+     *
+     * @param ms Número de milisegundos a esperar.
+     */
+    void sleep(int ms) const {
+        fenster_sleep(ms);
+    }
+
+    /**
+     * @brief Obtiene el color de un pixel de la ventana.
+     *
+     * @param xy Coordenadas del pixel de la pantalla del que se quiere saber el color.
+     * @returns El color del pixel en las coordenadas indicadas.
+     */
+    // TODO
+    // Color get_pixel(Pt xy) const {
+    //     return fenster_pixel(&fenster_, xy.x * zoom_, xy.y * zoom_);
+    // }
+
+    /**
+     * @brief Cambia un pixel de la ventana.
+     *
+     * En realidad, `set_pixel` no cambia la ventana directamente, sinó un "buffer" interno que se
+     * vuelca en la pantalla de golpe en el momento de llamar a `next_frame`. Esto es más eficiente
+     * y maximiza el tiempo en que el fotograma está inmóvil en la pantalla mostrando una imagen
+     * fija, ya que el pintado podría llevar tanto tiempo que los fotogramas no se verían completos
+     * en la pantalla durante los 16ms (a 60Hz) en que deben estar visibles.
+     *
+     * @param xy Coordenadas del pixel que se quiere cambiar
+     * @param color Color que se quiere poner en el pixel indicado
+     */
+    // void set_pixel(Pt xy, Color color); // TODO
+
+    /**
+     * @brief Escribe un texto en la ventana.
+     * 
+     * `draw_txt` utiliza el formato de fuente 5x7 para escribir en la ventana el texto que se le
+     * introduce como parámetro. Primeramente, asocia el parámetro `txt` con su correspondiente letra
+     * en el mapa `font5x7`. Seguidamente, utiliza un algoritmo para pintar un pixel (usando la función 
+     * `set_pixel`) por cada '#' que encuentra en el elemento correspondiente del mapa, hasta que se 
+     * termina formando el número completo.
+     *
+     * @param pt Coordenadas del número que se quiere mostrar
+     * @param txt Texto que se quiere mostrar en la ventana
+     * @param color Color que se quiere poner en el pixel indicado
+     */
+    // void draw_txt(Pt pt, const std::string& txt, Color color); // TODO
+
+    /**
+     * @brief Cambia los FPS de refresco de la ventana.
+     *
+     * En función de la velocidad de refresco de la pantalla que queramos, el tiempo a esperar entre
+     * que pintamos un fotograma y el siguiente puede variar. Este método calcula un tiempo de
+     * espera entre una llamada a `next_frame` y la siguiente, para que se produzca exactamente
+     * un número de fotogramas por segundo.
+     *
+     * @param fps Número de fotogramas por segundo que se quieren mostrar.
+     *
+     * @pre `fps` > 0 && `fps` < 240.
+     */
+    void set_fps(int fps) {
+        assert(fps > 0 && fps < 240);
+        fps_ = fps;
+    }
 };
 }  // namespace pro2
 
