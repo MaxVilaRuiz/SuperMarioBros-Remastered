@@ -185,6 +185,74 @@ class Window {
     int height() const {
         return fenster_.height / zoom_;
     }
+
+        /**
+     * @brief Gestiona las tareas necesarias para pasar al siguiente fotograma.
+     *
+     * En todo programa gráfico es necesario: 1) pintar en una superfície, típicamente en memoria,
+     * 2) transferir lo que se ha pintado a la pantalla, 3) procesar eventos ocurridos como presión
+     * de teclas o movimiento del ratón y actualizar su estado, y 4) esperar el tiempo que quede
+     * hasta el siguiente fotograma (en función de la velocidad de refresco, que suele ser de 60Hz,
+     * lo que equivale a 16ms por fotograma).
+     *
+     * `next_frame` hace todas estas cosas en una sola llamada. Además devuelve `false` cuando se ha
+     * clicado el botón de cerrar la ventana (típicamente arriba a la derecha, y con una "x"), de
+     * forma que se pueda saber si se debe continuar en un bucle de pintado de fotogramas.
+     *
+     * El uso típico es el siguiente:
+     * ```c++
+     * while (window.next_frame()) {
+     *     // usar los métodos de detección de teclas o ratón, y set_pixel para pintar...
+     * }
+     * ```
+     * Es decir, hasta que no se cierre la ventana llamamos métodos de la ventana para hacer
+     * operaciones que resulten en el pintado de la ventana de cierta manera y `next_frame` se hace
+     * cargo del resto.
+     *
+     * Con respecto al teclado y ratón, `next_frame` recoge todos los eventos (presión y soltado de
+     * teclas, clicks y movimiento del ratón) que han ocurrido entre el fotograma anterior y el
+     * actual, y con todos ellos actualiza el estado final de cada tecla, botón del ratón y
+     * posición. Así pues, el usuario de la clase `Window` tiene acceso al estado exacto de las
+     * teclas y el ratón en el instante en que se pasa al fotograma actual, y ese estado se conserva
+     * fijo mientras transcurre el tiempo entre el fotograma actual y el siguiente, en el que
+     * `next_frame` vuelve a revisar los eventos ocurridos en ese intervalo de tiempo.
+     *
+     * @returns `true` si el programa debe seguir (NO se ha clicado el botón de cerrar la ventana),
+     * `false` en caso contrario.
+     *
+     */
+    bool next_frame();
+
+    /**
+     * @brief Rellena la ventana con un color.
+     *
+     * Este método se puede llamar con un color o bien sin parámetros. Si se llama sin parámetros se
+     * toma el `color` por defecto, que es el negro (`black`). De lo contrario se usa el
+     * color indicado.
+     *
+     * @param color El color a utilizar para pintar. Se puede usar uno de los valores del enumerado
+     * `Colors`, como `red`, o bien poner un entero en hexadecimal, como 0x0084fb, que
+     * equivale a los 3 valores RGB (o Red-Green-Blue) que conforman el color. Cualquier "color
+     * picker" de la web suele mostrar el color hexadecimal en la notación `#0084fb` (de CSS).
+     */
+    void clear(Color color = black);
+
+    /**
+     * @brief Devuelve el contador de fotogramas pintados hasta el momento.
+     *
+     * Equivale a la cantidad de veces que se ha llamado a `next_frame`. Se incrementa en 1 unidad
+     * en cada fotograma.
+     *
+     * Este valor es útil al hacer animaciones, ya que permite saber, de una secuencia de imágenes,
+     * cuál habría que usar en cada momento.
+     *
+     * @returns Un entero que corresponde al contador de fotogramas mostrados desde que la ventana
+     * se creó.
+     * 
+     */
+    int frame_count() const {
+        return frame_count_;
+    }
 };
 }  // namespace pro2
 
