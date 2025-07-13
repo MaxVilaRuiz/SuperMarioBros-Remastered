@@ -6,7 +6,8 @@
 using std::string;
 
 namespace pro2 {
-    Window::Window(string title, int width, int height, int zoom)
+
+Window::Window(string title, int width, int height, int zoom)
     : fenster_{.title = title.c_str(), .width = width * zoom, .height = height * zoom},
       zoom_(zoom),
       pixels_size_(width * height * zoom * zoom)  //
@@ -17,20 +18,19 @@ namespace pro2 {
     last_time_ = fenster_time();
 }
 
-// TODO
-// void Window::update_camera_() {
-//     if (topleft_.x < topleft_target_.x) {
-//         topleft_.x += std::min(camera_speed_, topleft_target_.x - topleft_.x);
-//     } else if (topleft_.x > topleft_target_.x) {
-//         topleft_.x -= std::min(camera_speed_, topleft_.x - topleft_target_.x);
-//     }
+void Window::update_camera_() {
+    if (topleft_.x < topleft_target_.x) {
+        topleft_.x += std::min(camera_speed_, topleft_target_.x - topleft_.x);
+    } else if (topleft_.x > topleft_target_.x) {
+        topleft_.x -= std::min(camera_speed_, topleft_.x - topleft_target_.x);
+    }
 
-//     if (topleft_.y < topleft_target_.y) {
-//         topleft_.y += std::min(camera_speed_, topleft_target_.y - topleft_.y);
-//     } else if (topleft_.y > topleft_target_.y) {
-//         topleft_.y -= std::min(camera_speed_, topleft_.y - topleft_target_.y);
-//     }
-// }
+    if (topleft_.y < topleft_target_.y) {
+        topleft_.y += std::min(camera_speed_, topleft_target_.y - topleft_.y);
+    } else if (topleft_.y > topleft_target_.y) {
+        topleft_.y -= std::min(camera_speed_, topleft_.y - topleft_target_.y);
+    }
+}
 
 bool Window::next_frame() {
     update_camera_();
@@ -56,40 +56,38 @@ void Window::clear(Color color) {
     }
 }
 
-// TODO
-// Pt Window::mouse_pos() const {
-//     const int width = fenster_.width / zoom_;
-//     const int height = fenster_.height / zoom_;
+Pt Window::mouse_pos() const {
+    const int width = fenster_.width / zoom_;
+    const int height = fenster_.height / zoom_;
 
-//     int x = fenster_.x / zoom_;
-//     int y = fenster_.y / zoom_;
-//     if (x >= width) {
-//         x = width - 1;
-//     } else if (x < 0) {
-//         x = 0;
-//     }
-//     if (y >= height) {
-//         y = height - 1;
-//     } else if (y < 0) {
-//         y = 0;
-//     }
+    int x = fenster_.x / zoom_;
+    int y = fenster_.y / zoom_;
+    if (x >= width) {
+        x = width - 1;
+    } else if (x < 0) {
+        x = 0;
+    }
+    if (y >= height) {
+        y = height - 1;
+    } else if (y < 0) {
+        y = 0;
+    }
 
-//     return Pt{x + topleft_.x, y + topleft_.y};
-// }
+    return Pt{x + topleft_.x, y + topleft_.y};
+}
 
-// TODO
-// void Window::set_pixel(Pt pt, Color color) {
-//     const Pt camera_pt = {pt.x - topleft_.x, pt.y - topleft_.y};
-//     for (int i = 0; i < zoom_; i++) {
-//         for (int j = 0; j < zoom_; j++) {
-//             const int _i = camera_pt.x * zoom_ + i;
-//             const int _j = camera_pt.y * zoom_ + j;
-//             if (_i >= 0 && _i < fenster_.width && _j >= 0 && _j < fenster_.height) {
-//                 fenster_pixel(&fenster_, _i, _j) = color;
-//             }
-//         }
-//     }
-// }
+void Window::set_pixel(Pt pt, Color color) {
+    const Pt camera_pt = {pt.x - topleft_.x, pt.y - topleft_.y};
+    for (int i = 0; i < zoom_; i++) {
+        for (int j = 0; j < zoom_; j++) {
+            const int _i = camera_pt.x * zoom_ + i;
+            const int _j = camera_pt.y * zoom_ + j;
+            if (_i >= 0 && _i < fenster_.width && _j >= 0 && _j < fenster_.height) {
+                fenster_pixel(&fenster_, _i, _j) = color;
+            }
+        }
+    }
+}
 
 static const std::map<char, std::vector<std::string>> font5x7 = {
     {' ', {
@@ -481,23 +479,26 @@ static const std::map<char, std::vector<std::string>> font5x7 = {
     }}
 };
 
-// void Window::draw_txt(Pt pt, const std::string& txt, Color color) {
-//     const int char_spacing = 1;
-//     int x = pt.x;
+void Window::draw_txt(Pt pt, const std::string& txt, Color color) {
+    const int char_spacing = 1;
+    int x = pt.x;
 
-//     for (char c : txt) {
-//         if (font5x7.count(c) == 0) x += 6;
-//         else {
-//             const auto& txt = font5x7.at(c);
-//             for (int j = 0; j < int(txt.size()); ++j) {
-//                 for (int k = 0; k < int(txt[j].size()); ++k) {
-//                     if (txt[j][k] == '#') {
-//                         set_pixel({x + k, pt.y + j}, color);
-//                     }
-//                 }
-//             }
-//             x += int(txt[0].size()) + char_spacing;
-//         }
-//     }
-// }
+    for (char c : txt) {
+        if (font5x7.count(c) == 0) x += 6;
+        else {
+            const auto& txt = font5x7.at(c);
+            for (int j = 0; j < int(txt.size()); ++j) {
+                for (int k = 0; k < int(txt[j].size()); ++k) {
+                    if (txt[j][k] == '#') {
+                        set_pixel({x + k, pt.y + j}, color);
+                    }
+                }
+            }
+            x += int(txt[0].size()) + char_spacing;
+        }
+    }
 }
+
+
+
+}  // namespace pro2

@@ -9,6 +9,8 @@
 #define FENSTER_HEADER
 #include "fenster.h"
 
+#include "geometry.hh"
+
 namespace pro2 {
 
 /**
@@ -23,6 +25,7 @@ enum ModKey { Ctrl = 1, Shift = 2, Alt = 4, Meta = 8 };
  *
  * Enumerado de colores con los colores más simples (los 8 colores de la paleta EGA).
  */
+
 typedef uint32_t Color;
 
 const Color black = 0x00000000;
@@ -83,94 +86,101 @@ enum Keys {
  * editores.
  */
 class Window {
-    private:
-       /**
-        * @brief La estructura de datos que Fenster necesita para trabajar
-        */
-       int     last_keys_[256];
-       int     last_mouse_;
-       fenster fenster_;
-   
-       /**
-        * @brief El buffer de pixels que se reserva como zona de pintado
-        *
-        * Cada pixel tiene 32bits, o 4 bytes, y los 3 bytes de menos peso son los valores (entre 0 y
-        * 255) de los canales R, G y B (red, green y blue).
-        */
-       uint32_t *pixels_;
-   
-       /**
-        * @brief Tamaño del buffer en bytes
-        */
-       size_t pixels_size_;
-   
-       /**
-        * @brief Parámetro de `zoom` para esta ventana
-        */
-       int zoom_ = 1;
-   
-       /**
-        * @brief Instance del último fotograma (epoch)
-        */
-       int64_t last_time_;
-   
-       /**
-        * @brief Contador de frames (o fotogramas)
-        */
-       int frame_count_ = 0;
-   
-       /**
-        * @brief Fotogramas por segundo (FPS)
-        */
-       uint8_t fps_ = 60;
-   
-       // Cámara
-       // TODO
-   
-       /**
-        * @brief Este método actualiza la cámara en función de la velocidad.
-        */
-       void update_camera_();
-   
-       /**
-        * @brief Determina si la cámara está en movimiento (su posición final es distinta de la
-        * actual).
-        */
-        // TODO
-   
-       /**
-        * @brief Constante de la velocidad a la que la cámara se desplaza a la nueva posición.
-        */
-       static constexpr int camera_speed_ = 8;
+ private:
+    /**
+     * @brief La estructura de datos que Fenster necesita para trabajar
+     */
+    int     last_keys_[256];
+    int     last_mouse_;
+    fenster fenster_;
 
-       public:
-       /**
-        * @brief Contruye una ventana con título, anchura y altura.
-        *
-        * El constructor abre una ventana, y el destructor la cierra.
-        *
-        * El parámetro `zoom` permite visualizar con más comodidad contenido pixelado. Con `zoom = 1`
-        * cada pixel de la ventana se corresponde con un pixel de la pantalla. Con `zoom = 3`, cada
-        * píxel de la ventana se convierte en un cuadrado de 3x3 píxeles en la ventana.
-        *
-        * @param title El título de la ventana (un literal de cadena de caracteres)
-        * @param width El ancho de la ventana en píxels.
-        * @param height El alto de la ventana en píxels.
-        * @param zoom El factor de aumento de cada píxel. (Es opcional, si no hay 4o parámetro toma
-        * valor 1)
-        */
-       Window(std::string title, int width, int height, int zoom = 1);
-   
-       /**
-        * @brief Destruye una ventana, es decir, cierra la ventana abierta en el constructor.
-        *
-        */
-       ~Window() {
-           fenster_close(&fenster_);
-           delete[] pixels_;
-       }
+    /**
+     * @brief El buffer de pixels que se reserva como zona de pintado
+     *
+     * Cada pixel tiene 32bits, o 4 bytes, y los 3 bytes de menos peso son los valores (entre 0 y
+     * 255) de los canales R, G y B (red, green y blue).
+     */
+    uint32_t *pixels_;
 
-           /**
+    /**
+     * @brief Tamaño del buffer en bytes
+     */
+    size_t pixels_size_;
+
+    /**
+     * @brief Parámetro de `zoom` para esta ventana
+     */
+    int zoom_ = 1;
+
+    /**
+     * @brief Instance del último fotograma (epoch)
+     */
+    int64_t last_time_;
+
+    /**
+     * @brief Contador de frames (o fotogramas)
+     */
+    int frame_count_ = 0;
+
+    /**
+     * @brief Fotogramas por segundo (FPS)
+     */
+    uint8_t fps_ = 60;
+
+    // Cámara
+
+    /**
+     * @brief Camera topleft
+     */
+    Pt topleft_ = {0, 0};
+    Pt topleft_target_ = {0, 0};
+
+    /**
+     * @brief Este método actualiza la cámara en función de la velocidad.
+     */
+    void update_camera_();
+
+    /**
+     * @brief Determina si la cámara está en movimiento (su posición final es distinta de la
+     * actual).
+     */
+    bool camera_moving_() const {
+        return topleft_.x != topleft_target_.x || topleft_.y != topleft_target_.y;
+    }
+
+    /**
+     * @brief Constante de la velocidad a la que la cámara se desplaza a la nueva posición.
+     */
+    static constexpr int camera_speed_ = 8;
+
+ public:
+    /**
+     * @brief Contruye una ventana con título, anchura y altura.
+     *
+     * El constructor abre una ventana, y el destructor la cierra.
+     *
+     * El parámetro `zoom` permite visualizar con más comodidad contenido pixelado. Con `zoom = 1`
+     * cada pixel de la ventana se corresponde con un pixel de la pantalla. Con `zoom = 3`, cada
+     * píxel de la ventana se convierte en un cuadrado de 3x3 píxeles en la ventana.
+     *
+     * @param title El título de la ventana (un literal de cadena de caracteres)
+     * @param width El ancho de la ventana en píxels.
+     * @param height El alto de la ventana en píxels.
+     * @param zoom El factor de aumento de cada píxel. (Es opcional, si no hay 4o parámetro toma
+     * valor 1)
+     */
+    Window(std::string title, int width, int height, int zoom = 1);
+
+    /**
+     * @brief Destruye una ventana, es decir, cierra la ventana abierta en el constructor.
+     *
+     */
+    ~Window() {
+        fenster_close(&fenster_);
+        delete[] pixels_;
+    }
+
+    /**
      * @brief Devuelve el ancho de la ventana.
      *
      */
@@ -186,7 +196,7 @@ class Window {
         return fenster_.height / zoom_;
     }
 
-        /**
+    /**
      * @brief Gestiona las tareas necesarias para pasar al siguiente fotograma.
      *
      * En todo programa gráfico es necesario: 1) pintar en una superfície, típicamente en memoria,
@@ -254,7 +264,7 @@ class Window {
         return frame_count_;
     }
 
-        /**
+    /**
      * @brief Determina si cierta tecla estuvo presionada en el fotograma anterior
      *
      * El método `next_frame` recoge todas los eventos de teclado y ratón que han ocurrido desde la
@@ -306,7 +316,7 @@ class Window {
         return code >= 0 && code < 128 && !last_keys_[code] && fenster_.keys[code];
     }
 
-        /**
+    /**
      * @brief Determina si cierta tecla de control se presionó entre el fotograma anterior y el
      * actual
      *
@@ -355,9 +365,9 @@ class Window {
      * @returns Una tupla de tipo `Pt`, con campos `x` e `y`, que se corresponden con las
      * coordenadas de la posición del ratón.
      */
-    // Pt mouse_pos() const; // TODO
+    Pt mouse_pos() const;
 
-        /**
+    /**
      * @brief Espera que pase un número `ms` de milisegundos sin hacer nada.
      *
      * En ese intervalo de tiempo el programa estará esperando que el método vuelva de la llamada, y
@@ -375,10 +385,9 @@ class Window {
      * @param xy Coordenadas del pixel de la pantalla del que se quiere saber el color.
      * @returns El color del pixel en las coordenadas indicadas.
      */
-    // TODO
-    // Color get_pixel(Pt xy) const {
-    //     return fenster_pixel(&fenster_, xy.x * zoom_, xy.y * zoom_);
-    // }
+    Color get_pixel(Pt xy) const {
+        return fenster_pixel(&fenster_, xy.x * zoom_, xy.y * zoom_);
+    }
 
     /**
      * @brief Cambia un pixel de la ventana.
@@ -392,7 +401,7 @@ class Window {
      * @param xy Coordenadas del pixel que se quiere cambiar
      * @param color Color que se quiere poner en el pixel indicado
      */
-    // void set_pixel(Pt xy, Color color); // TODO
+    void set_pixel(Pt xy, Color color);
 
     /**
      * @brief Escribe un texto en la ventana.
@@ -407,7 +416,7 @@ class Window {
      * @param txt Texto que se quiere mostrar en la ventana
      * @param color Color que se quiere poner en el pixel indicado
      */
-    // void draw_txt(Pt pt, const std::string& txt, Color color); // TODO
+    void draw_txt(Pt pt, const std::string& txt, Color color);
 
     /**
      * @brief Cambia los FPS de refresco de la ventana.
@@ -426,7 +435,7 @@ class Window {
         fps_ = fps;
     }
 
-        /**
+    /**
      * @brief Indica que la posición de la esquina superior izquierda de la ventana debería moverse
      * según el vector `desplazamiento`.
      *
@@ -435,36 +444,33 @@ class Window {
      *
      * @param desplazamiento Vector de desplazamiento
      */
-    // TODO
-    // void move_camera(Pt desplazamiento) {
-    //     if (!camera_moving_()) {
-    //         topleft_target_.x = topleft_.x + desplazamiento.x;
-    //         topleft_target_.y = topleft_.y + desplazamiento.y;
-    //     }
-    // }
+    void move_camera(Pt desplazamiento) {
+        if (!camera_moving_()) {
+            topleft_target_.x = topleft_.x + desplazamiento.x;
+            topleft_target_.y = topleft_.y + desplazamiento.y;
+        }
+    }
 
     /**
      * @brief Devuelve la posición del centro de la cámara.
      *
      * @returns Un `Pt` con las coordenadas del centro de la cámara.
      */
-    // TOOD
-    // Pt camera_center() const {
-    //     const int width = fenster_.width / zoom_;
-    //     const int height = fenster_.height / zoom_;
-    //     return {topleft_.x + width / 2, topleft_.y + height / 2};
-    // }
+    Pt camera_center() const {
+        const int width = fenster_.width / zoom_;
+        const int height = fenster_.height / zoom_;
+        return {topleft_.x + width / 2, topleft_.y + height / 2};
+    }
 
-    // TODO
-    // Rect camera_rect() const {
-    //     const int width = fenster_.width / zoom_;
-    //     const int height = fenster_.height / zoom_;
-    //     const int left = topleft_.x;
-    //     const int top = topleft_.y;
-    //     const int right = topleft_.x + width;
-    //     const int bottom = topleft_.y + height;
-    //     return {left, top, right, bottom};
-    // }
+    Rect camera_rect() const {
+        const int width = fenster_.width / zoom_;
+        const int height = fenster_.height / zoom_;
+        const int left = topleft_.x;
+        const int top = topleft_.y;
+        const int right = topleft_.x + width;
+        const int bottom = topleft_.y + height;
+        return {left, top, right, bottom};
+    }
 
     /**
      * @brief Establece la posición de la esquina superior izquierda de la cámara.
@@ -473,22 +479,21 @@ class Window {
      *
      * @param topleft La nueva posición absoluta de la cámara, que se aplica instantáneamente.
      */
-    // TODO
-    // void set_camera_topleft(Pt topleft) {
-    //     topleft_ = topleft;
-    //     topleft_target_ = topleft;
-    // }
+    void set_camera_topleft(Pt topleft) {
+        topleft_ = topleft;
+        topleft_target_ = topleft;
+    }
 
     /**
      * @brief Devuelve la posición de la esquina superior izquierda de la cámara.
      *
      * @returns Un `Pt` con las coordenadas de la esquina superior izquierda de la cámara.
      */
-    // TODO
-    // Pt topleft() const {
-    //     return topleft_;
-    // }
+    Pt topleft() const {
+        return topleft_;
+    }
 };
+
 }  // namespace pro2
 
 #endif
