@@ -564,3 +564,36 @@ const vector<vector<int>> MainChar::starmode_sprite_big_walk3_ = {
     {_, _, _, _, w, w, w, w, _, _, _, _},
     {_, _, _, _, w, w, w, w, w, _, _, _},
 };
+
+// Lives sprite
+const vector<vector<int>> MainChar::mario_lives_sprite_ = {
+    {_, _, _, _, _, _, _, _, _, _, _, _},
+    {_, _, _, h, h, h, _, h, h, h, _, _},
+    {_, _, h, r, r, r, h, r, r, r, h, _},
+    {_, h, r, i, i, r, h, r, r, r, r, h},
+    {_, h, r, i, r, r, r, r, r, r, r, h},
+    {_, h, r, i, r, r, r, r, r, r, r, h},
+    {_, h, r, r, r, r, r, r, r, r, r, h},
+    {_, _, h, r, r, r, r, r, r, r, h, _},
+    {_, _, _, h, r, r, r, r, r, h, _, _},
+    {_, _, _, _, h, r, r, r, h, _, _, _},
+    {_, _, _, _, _, h, r, h, _, _, _, _},
+    {_, _, _, _, _, _, h, _, _, _, _, _},
+    {_, _, _, _, _, _, _, _, _, _, _, _},    
+};
+const vector<vector<int>> MainChar::luigi_lives_sprite_ = {
+    {_, _, _, _, _, _, _, _, _, _, _, _},
+    {_, _, _, h, h, h, _, h, h, h, _, _},
+    {_, _, h, e, e, e, h, e, e, e, h, _},
+    {_, h, e, i, i, e, h, e, e, e, e, h},
+    {_, h, e, i, e, e, e, e, e, e, e, h},
+    {_, h, e, i, e, e, e, e, e, e, e, h},
+    {_, h, e, e, e, e, e, e, e, e, e, h},
+    {_, _, h, e, e, e, e, e, e, e, h, _},
+    {_, _, _, h, e, e, e, e, e, h, _, _},
+    {_, _, _, _, h, e, e, e, h, _, _, _},
+    {_, _, _, _, _, h, e, h, _, _, _, _},
+    {_, _, _, _, _, _, h, _, _, _, _, _},
+    {_, _, _, _, _, _, _, _, _, _, _, _},    
+};
+// clang-format on
