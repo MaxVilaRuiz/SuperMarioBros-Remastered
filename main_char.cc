@@ -597,3 +597,155 @@ const vector<vector<int>> MainChar::luigi_lives_sprite_ = {
     {_, _, _, _, _, _, _, _, _, _, _, _},    
 };
 // clang-format on
+
+void MainChar::paint(pro2::Window& window, bool immune, int frame) const {
+    Pt pos = {pos_.x - 6, pos_.y - 15};
+    const vector<vector<int>>* sprite = nullptr;
+    if (0 < star_counter_) {
+        if (0 < growth_counter_) {
+            pos.y -= 3;
+            bool phase = 4 < (growth_counter_ % 10);
+    
+            if (30 < growth_counter_) sprite = phase ? &starmode_sprite_medium_ : &starmode_sprite_normal_;
+            else sprite = phase ? &starmode_sprite_big_ : &starmode_sprite_medium_;
+
+            paint_sprite(window, pos, *sprite, looking_left_);
+        }
+        else if (0 < decrease_counter_) {
+            pos.y -= 3;
+    
+            if (!immune || (immune && (frame % 2 == 0))) {
+                bool phase = 4 < (decrease_counter_ % 10);
+    
+                if (30 < decrease_counter_) sprite = phase ? &starmode_sprite_medium_ : &starmode_sprite_big_;
+                else sprite = phase ? &starmode_sprite_normal_ : &starmode_sprite_medium_;
+                
+                paint_sprite(window, pos, *sprite, looking_left_);
+            }
+        }
+        else {
+            if (!immune || (immune && (frame % 2 == 0))) {
+                if (big_) {
+                    pos.y -= 4;
+                    if (speed_.x != 0) {
+                        int phase = (animation_counter_ / animation_speed_) % 3;
+                        if (phase == 0) sprite = &starmode_sprite_big_walk1_;
+                        else if (phase == 1) sprite = &starmode_sprite_big_walk2_;
+                        else sprite = &starmode_sprite_big_walk3_;
+                    }
+                    else sprite = &starmode_sprite_big_;
+                }
+                else {
+                    if (speed_.x != 0) {
+                        int phase = (animation_counter_ / animation_speed_) % 3;
+                        if (phase == 0) sprite = &starmode_sprite_normal_walk1_;
+                        else if (phase == 1) sprite = &starmode_sprite_normal_walk2_;
+                        else sprite = &starmode_sprite_normal_walk3_;
+                    }
+                    else sprite = &starmode_sprite_normal_;   
+                }
+
+                paint_sprite(window, pos, *sprite, looking_left_);
+            }
+        }
+    }
+    else {
+        if (0 < growth_counter_) {
+            pos.y -= 3;
+            bool phase = 4 < (growth_counter_ % 10);
+    
+            if (character_ == "mario") {
+                if (30 < growth_counter_) sprite = phase ? &mario_sprite_medium_ : &mario_sprite_normal_;
+                else sprite = phase ? &mario_sprite_big_ : &mario_sprite_medium_;
+            }
+            else {
+                if (30 < growth_counter_) sprite = phase ? &luigi_sprite_medium_ : &luigi_sprite_normal_;
+                else sprite = phase ? &luigi_sprite_big_ : &luigi_sprite_medium_;
+            }
+            paint_sprite(window, pos, *sprite, looking_left_);
+        }
+        else if (0 < decrease_counter_) {
+            pos.y -= 3;
+    
+            if (!immune || (immune && (frame % 2 == 0))) {
+                bool phase = 4 < (decrease_counter_ % 10);
+    
+                if (character_ == "mario") {
+                    if (30 < decrease_counter_) sprite = phase ? &mario_sprite_medium_ : &mario_sprite_big_;
+                    else sprite = phase ? &mario_sprite_normal_ : &mario_sprite_medium_;
+                }
+                else {
+                    if (30 < decrease_counter_) sprite = phase ? &luigi_sprite_medium_ : &luigi_sprite_big_;
+                    else sprite = phase ? &luigi_sprite_normal_ : &luigi_sprite_medium_;
+                }
+                
+                paint_sprite(window, pos, *sprite, looking_left_);
+            }
+        }
+        else {
+            if (!immune || (immune && (frame % 2 == 0))) {
+                if (character_ == "mario") {
+                    if (big_) {
+                        pos.y -= 4;
+                        if (speed_.x != 0) {
+                            int phase = (animation_counter_ / animation_speed_) % 3;
+                            if (phase == 0) sprite = &mario_sprite_big_walk1_;
+                            else if (phase == 1) sprite = &mario_sprite_big_walk2_;
+                            else sprite = &mario_sprite_big_walk3_;
+                        }
+                        else sprite = &mario_sprite_big_;
+                    }
+                    else {
+                        if (speed_.x != 0) {
+                            int phase = (animation_counter_ / animation_speed_) % 3;
+                            if (phase == 0) sprite = &mario_sprite_normal_walk1_;
+                            else if (phase == 1) sprite = &mario_sprite_normal_walk2_;
+                            else sprite = &mario_sprite_normal_walk3_;
+                        }
+                        else sprite = &mario_sprite_normal_;   
+                    }
+                }
+                else {
+                    if (big_) {
+                        pos.y -= 4;
+                        if (speed_.x != 0) {
+                            int phase = (animation_counter_ / animation_speed_) % 3;
+                            if (phase == 0) sprite = &luigi_sprite_big_walk1_;
+                            else if (phase == 1) sprite = &luigi_sprite_big_walk2_;
+                            else sprite = &luigi_sprite_big_walk3_;
+                        }
+                        else sprite = &luigi_sprite_big_;
+                    }
+                    else {
+                        if (speed_.x != 0) {
+                            int phase = (animation_counter_ / animation_speed_) % 3;
+                            if (phase == 0) sprite = &luigi_sprite_normal_walk1_;
+                            else if (phase == 1) sprite = &luigi_sprite_normal_walk2_;
+                            else sprite = &luigi_sprite_normal_walk3_;
+                        }
+                        else sprite = &luigi_sprite_normal_;
+                    }
+                }
+                paint_sprite(window, pos, *sprite, looking_left_);
+            }
+        }
+    }
+}
+
+
+void MainChar::paint_lives(pro2::Window& window, string character) const {
+    if (character == "mario") {
+        const pro2::Pt top_left = {window.camera_rect().left + 5, window.camera_rect().top + 5};
+
+        for (int i = 0; i < lives_; i++) {
+            paint_sprite(window, {top_left.x + 15*i, top_left.y}, mario_lives_sprite_, false);
+        }
+    }
+    else {
+        const pro2::Pt top_left = {window.camera_rect().left + 5, window.camera_rect().top + 20};
+
+        for (int i = 0; i < lives_; i++) {
+            paint_sprite(window, {top_left.x + 15*i, top_left.y}, luigi_lives_sprite_, false);
+        }
+    }
+}
