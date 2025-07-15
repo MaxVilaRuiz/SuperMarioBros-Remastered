@@ -51,3 +51,52 @@ const vector<vector<int>> Goomba::goomba_sprite_squashed_ = {
     {_, b, b, b, b, _, _, b, b, b, b, _},
 };
 // clang-format on
+
+void Goomba::update() {
+    if (!squashed_) {
+        if (to_right_) {
+            if (pos_.x + travel_ <= actual_pos_) {
+                to_right_ = false;
+                actual_pos_ -= speed_;
+            } 
+            else actual_pos_ += speed_;
+        } 
+        else {
+            if (actual_pos_ <= pos_.x - travel_) {
+                to_right_ = true;
+                actual_pos_ += speed_;
+            } 
+            else actual_pos_ -= speed_;
+        }
+    }
+
+    frame_++;
+}
+
+
+void Goomba::paint(pro2::Window& window) const {
+    const std::vector<std::vector<int>>* sprite;
+    const int phase = (frame_ / animation_speed_) % 2;
+
+    if (squashed_) sprite = &goomba_sprite_squashed_;
+    else {
+        sprite = (phase == 0) ? &goomba_sprite_normal1_ : &goomba_sprite_normal2_;
+    }
+
+    paint_sprite(window, {actual_pos_, pos_.y}, *sprite, false);
+}
+
+
+pro2::Rect Goomba::get_rect() const {
+    int left = actual_pos_ - 10;
+    int top = pos_.y;
+    int right = actual_pos_ + 10;
+    int bottom = pos_.y + 30;
+    return {left, top, right, bottom};
+}
+
+void Goomba::hit_from_above(int global_frame) {
+    squashed_ = true;
+    deadtime_ = global_frame + 30; // 0.5s at 60fps
+    pos_.y += 4;
+}
