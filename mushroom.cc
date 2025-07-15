@@ -25,3 +25,22 @@ const vector<vector<int>> Mushroom::mushroom_sprite_ = {
     {_, _, _, b, b, b, b, b, b, _, _, _}
 };
 // clang-format on
+
+void Mushroom::paint(pro2::Window& window) const {
+    paint_sprite(window, {pos_.x, pos_.y}, mushroom_sprite_, false);
+}
+
+
+void Mushroom::update() {
+    int phase = (frame_ / animation_speed_) % 12;
+    
+    if (phase == 10) pos_.y -= 1;
+    else if (phase == 11) pos_.y += 1;
+
+    frame_++;
+}
+
+
+pro2::Rect Mushroom::get_rect() const {
+    return {pos_.x - 5, pos_.y - 5, pos_.x + 12, pos_.y + 10};
+}
