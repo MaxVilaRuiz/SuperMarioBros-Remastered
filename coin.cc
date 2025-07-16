@@ -230,3 +230,16 @@ void Coin::paint(pro2::Window& window) const {
             break;
     }
 }
+
+void Coin::update() {
+    frame_++;
+}
+
+
+pro2::Rect Coin::get_rect() const {
+    int left = pos_.x;
+    int top = pos_.y + 2;
+    int right = pos_.x + 12;
+    int bottom = pos_.y + 20;
+    return {left, top, right, bottom};    
+}
