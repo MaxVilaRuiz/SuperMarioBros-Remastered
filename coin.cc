@@ -177,3 +177,56 @@ const vector<vector<int>> Coin::coin_sprite_animation9_ = {
     {_, _, _, _, _, b, _, _, _, _, _, _},
 };
 // clang-format on
+
+void Coin::paint(pro2::Window& window) const {
+    int frame = (frame_ / animation_speed_) % 12;
+    switch (frame) { 
+        case 0:
+            paint_sprite(window, {pos_.x, pos_.y}, coin_sprite_front, false);
+            break;
+
+        case 1:
+            paint_sprite(window, {pos_.x, pos_.y + 1}, coin_sprite_animation1_, false);
+            break;
+
+        case 2:
+            paint_sprite(window, {pos_.x, pos_.y + 2}, coin_sprite_animation2_, false);
+            break;
+
+        case 3:
+            paint_sprite(window, {pos_.x, pos_.y + 3}, coin_sprite_animation3_, false);
+            break;
+            
+        case 4:
+            paint_sprite(window, {pos_.x, pos_.y + 4}, coin_sprite_animation4_, false);
+            break;
+
+        case 5:
+            paint_sprite(window, {pos_.x, pos_.y + 5}, coin_sprite_animation5_, false);
+            break;
+        
+        case 6:
+            paint_sprite(window, {pos_.x, pos_.y + 5}, coin_sprite_back_, false);
+            break;
+
+        case 7:
+            paint_sprite(window, {pos_.x, pos_.y + 4}, coin_sprite_animation6_, false);
+            break;
+        
+        case 8:
+            paint_sprite(window, {pos_.x, pos_.y + 3}, coin_sprite_animation7_, false);
+            break;
+
+        case 9:
+            paint_sprite(window, {pos_.x, pos_.y + 2}, coin_sprite_animation3_, false);
+            break;
+        
+        case 10:
+            paint_sprite(window, {pos_.x, pos_.y + 1}, coin_sprite_animation8_, false);
+            break;
+        
+        case 11:
+            paint_sprite(window, {pos_.x, pos_.y + 0}, coin_sprite_animation9_, false);
+            break;
+    }
+}
