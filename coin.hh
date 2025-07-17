@@ -22,7 +22,7 @@ class Coin {
     static const std::vector<std::vector<int>> coin_sprite_animation9_;
     static const std::vector<std::vector<int>> coin_sprite_back_;
 
-    public:
+  public:
     static const std::vector<std::vector<int>> coin_sprite_front; // Public facing sprite
 
     /// @brief Default constructor for data structures

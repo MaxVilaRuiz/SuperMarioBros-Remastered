@@ -26,6 +26,7 @@ const vector<vector<int>> Mushroom::mushroom_sprite_ = {
 };
 // clang-format on
 
+
 void Mushroom::paint(pro2::Window& window) const {
     paint_sprite(window, {pos_.x, pos_.y}, mushroom_sprite_, false);
 }

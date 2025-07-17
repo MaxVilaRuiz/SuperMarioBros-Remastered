@@ -5,7 +5,7 @@
 #include <set>
 #include "platform.hh"
 #include "window.hh"
-// #include "spike.hh"
+#include "spike.hh"
 
 class MainChar {
  private:
@@ -83,8 +83,8 @@ class MainChar {
      * @post Position and speed updated based on gravity and input.
      */
     void apply_physics_();
-
-    public:
+	
+ public:
     /// @brief Constructs MainChar at initial position with control keys.
     MainChar(pro2::Pt pos, int jump_key, int down_key, int left_key, int right_key, std::string character) 
         : pos_(pos), last_pos_(pos), jump_key_(jump_key), down_key_(down_key), left_key_(left_key), 

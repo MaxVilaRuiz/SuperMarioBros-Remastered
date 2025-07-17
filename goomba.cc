@@ -52,6 +52,7 @@ const vector<vector<int>> Goomba::goomba_sprite_squashed_ = {
 };
 // clang-format on
 
+
 void Goomba::update() {
     if (!squashed_) {
         if (to_right_) {

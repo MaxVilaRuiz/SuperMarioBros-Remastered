@@ -14,8 +14,8 @@ class Platform {
     // Default constructor (empty platform)
     Platform() : left_(0), right_(0), top_(0), bottom_(0) {}
 
-        // Copy constructor
-        Platform(const Platform& other)
+    // Copy constructor
+    Platform(const Platform& other)
         : left_(other.left_), right_(other.right_), top_(other.top_), bottom_(other.bottom_) {}
 
     // Parameterized constructor to define platform bounds

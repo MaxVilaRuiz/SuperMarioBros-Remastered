@@ -54,7 +54,7 @@ class Game {
     Finder<Star> star_finder_;                      // Star finder
     std::set<const Star*> star_actualObj_;          // Star in view
 
-        // Utils
+    // Utils
     static const std::vector<std::vector<int>> option_pointer_sprite_;
     static const std::vector<std::vector<int>> finish_flag_sprite_;
     std::vector<std::pair<std::string, std::vector<std::string>>> instructions_ = {

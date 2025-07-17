@@ -166,6 +166,7 @@ const std::vector<std::vector<int>> Game::finish_flag_sprite_ = {
 };
 // clang-format on
 
+
 Game::Game(int width, int height)
     : mario_({width / 2, 150}, Keys::Up, Keys::Down, Keys::Left, Keys::Right, "mario"),
       luigi_({(width / 2) - 30, 150}, Keys::W, Keys::S, Keys::A, Keys::D, "luigi")
@@ -281,6 +282,7 @@ Game::Game(int width, int height)
     for (const auto& star : stars_) star_finder_.add(&star);
 }
 
+
 void Game::process_keys(pro2::Window& window) {
     if (window.is_key_down(Keys::Escape)) {
         finished_ = true;
@@ -337,6 +339,7 @@ void Game::process_keys(pro2::Window& window) {
         }
     }
 }
+
 
 void Game::update_objects(pro2::Window& window) {
     // Restarting Game
@@ -528,6 +531,7 @@ void Game::update_objects(pro2::Window& window) {
     }
 }
 
+
 void Game::update_camera(pro2::Window& window) {
     const Pt mario_pos = mario_.pos();
     const Pt cam = window.camera_center();
@@ -547,6 +551,7 @@ void Game::update_camera(pro2::Window& window) {
 
     window.move_camera({dx, dy});
 }
+
 
 void Game::update(pro2::Window& window) {
     process_keys(window);
@@ -585,6 +590,7 @@ void Game::update(pro2::Window& window) {
         if (immune_luigi_ && immunity_luigi_until_ <= frame_counter_) immune_luigi_ = false;
     }
 }
+
 
 void Game::paint(pro2::Window& window) {
     // Paint the background and its objects

@@ -598,6 +598,7 @@ const vector<vector<int>> MainChar::luigi_lives_sprite_ = {
 };
 // clang-format on
 
+
 void MainChar::paint(pro2::Window& window, bool immune, int frame) const {
     Pt pos = {pos_.x - 6, pos_.y - 15};
     const vector<vector<int>>* sprite = nullptr;
@@ -749,6 +750,7 @@ void MainChar::paint_lives(pro2::Window& window, string character) const {
         }
     }
 }
+
 
 void MainChar::apply_physics_() {
     if (grounded_) {

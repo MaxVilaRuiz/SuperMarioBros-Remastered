@@ -178,6 +178,7 @@ const vector<vector<int>> Coin::coin_sprite_animation9_ = {
 };
 // clang-format on
 
+
 void Coin::paint(pro2::Window& window) const {
     int frame = (frame_ / animation_speed_) % 12;
     switch (frame) { 
@@ -230,6 +231,7 @@ void Coin::paint(pro2::Window& window) const {
             break;
     }
 }
+
 
 void Coin::update() {
     frame_++;

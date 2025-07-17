@@ -16,7 +16,7 @@ class Star {
     static const std::vector<std::vector<int>> star_sprite_animation3_;
     static const std::vector<std::vector<int>> star_sprite_animation4_;
 
-    public:
+  public:
     static const std::vector<std::vector<int>> star_sprite_front;
 
     /// @brief Default constructor for data structures

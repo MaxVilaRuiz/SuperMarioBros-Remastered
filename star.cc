@@ -95,6 +95,7 @@ const vector<vector<int>> Star::star_sprite_animation4_ = {
 };
 // clang-format on
 
+
 void Star::paint(pro2::Window& window) const {
     const std::vector<std::vector<int>>* sprite;
     const int phase = (frame_ / animation_speed_) % 12;
