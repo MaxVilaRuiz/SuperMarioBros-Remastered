@@ -280,3 +280,60 @@ Game::Game(int width, int height)
     // Add stars to finder
     for (const auto& star : stars_) star_finder_.add(&star);
 }
+
+void Game::process_keys(pro2::Window& window) {
+    if (window.is_key_down(Keys::Escape)) {
+        finished_ = true;
+        return;
+    }
+    else if (window.was_key_pressed(Keys::P)) paused_ = !paused_; // 'P' key to pause/unpause
+
+    // Process this keys if in pregame state
+    if (pregame_) {
+        if (window.was_key_pressed(Keys::Up) && *pregame_options_it_ == "2 PLAYER GAME") pregame_options_it_--;
+        else if (window.was_key_pressed(Keys::Down) && *pregame_options_it_ == "1 PLAYER GAME") pregame_options_it_++;
+        else if (window.was_key_pressed(Keys::Return)) {
+            if (*pregame_options_it_ == "1 PLAYER GAME") single_player_ = true;
+            else single_player_ = false;
+            paused_ = false;
+            pregame_ = false;
+        }
+    }
+
+    // Process this keys if in endgame state
+    if (endgame_) {
+        if (window.was_key_pressed(Keys::Up) && *endgame_options_it_ != "TRY AGAIN") endgame_options_it_--;
+        else if (window.was_key_pressed(Keys::Down) && *endgame_options_it_ != "QUIT") endgame_options_it_++;
+        else if (window.was_key_pressed(Keys::Return)) {
+            // Restore goombas
+            goombas_finder_.clear();
+            while (!goombas_.empty()) goombas_.pop_back();
+            goombas_.push_back(Goomba({496, 189}, 60));
+            goombas_.push_back(Goomba({921, 129}, 20));
+            goombas_.push_back(Goomba({1071, 189}, 20));
+            goombas_.push_back(Goomba({2113, 99}, 35));
+            for (int i = 0; i < 2; i++) goombas_.push_back(Goomba({1171 + 100*i, 189}, 45));
+            for (int i = 0; i < 4; i++) goombas_.push_back(Goomba({3491 + 100*i, 159}, 50));
+
+            // Add objects to finder
+            for (const auto& coin : coins_) coin_finder_.add(&coin);
+            for (const auto& mushroom : mushrooms_) mushroom_finder_.add(&mushroom);
+            for (const auto& goomba : goombas_) goombas_finder_.add(&goomba);
+            for (const auto& star : stars_) star_finder_.add(&star);
+            
+            if (*endgame_options_it_ == "TRY AGAIN") {
+                window.set_camera_topleft({0, 0});
+                restarting_game_ = true;
+            }
+            else if (*endgame_options_it_ == "MENU") {
+                window.set_camera_topleft({0, 0});
+                restarting_game_ = true;
+                pregame_ = true;
+            }
+            else finished_ = true;
+
+            paused_ = false;
+            endgame_ = false;
+        }
+    }
+}
