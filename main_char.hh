@@ -138,7 +138,7 @@ class MainChar {
      * @pre Inputs and platforms valid.
      * @post Updates position, speed, grounded state.
      */
-    // void update(pro2::Window& window, std::set<const Platform*> platforms, std::set<const Spike*> spikes);
+    void update(pro2::Window& window, std::set<const Platform*> platforms, std::set<const Spike*> spikes);
 
     /**
      * @brief Returns MainChar's bounding box.

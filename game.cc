@@ -337,3 +337,193 @@ void Game::process_keys(pro2::Window& window) {
         }
     }
 }
+
+void Game::update_objects(pro2::Window& window) {
+    // Restarting Game
+    Pt cam_center = window.camera_center();
+    if (restarting_game_ && (cam_center.x == int(width_ / 2) && cam_center.y == int(height_ / 2))) {
+        restarting_game_ = false;
+        mario_.reset_lives();
+        mario_.reset_position({width_ / 2, 150});
+        mario_.remove_starmode();
+        immune_mario_ = false;
+        num_coins_ = 0;
+        if (!single_player_) {
+            luigi_.reset_lives();
+            luigi_.reset_position({width_ / 2 - 30, 150}); 
+            luigi_.remove_starmode();
+            immune_luigi_ = false;
+        }
+    }
+
+    // Check if game is finished
+    if (4250 < mario_.pos().x || 4250 < luigi_.pos().x) {
+        endgame_ = true;
+        win_ = true;
+        paused_ = true;
+        mario_.remove_big();
+        mario_.remove_starmode();
+        if (!single_player_) {
+            luigi_.remove_big();
+            luigi_.remove_starmode();
+        }
+    }
+
+    // Update main characters
+    mario_.update(window, platform_actualObj_, spike_actualObj_);
+    if (!single_player_) luigi_.update(window, platform_actualObj_, spike_actualObj_);
+
+    // Subtract lives from characters if they are out of bounds
+    const int bottom_limit = window.camera_rect().bottom + 320;
+    if (mario_.pos().y > bottom_limit) {
+        mario_.lose_life();
+        Pt mario_last_pos = mario_.last_grounded_pos();
+        mario_.reset_position({mario_last_pos.x, mario_last_pos.y});
+    }
+    if (luigi_.pos().y > bottom_limit && !single_player_) {
+        luigi_.lose_life();
+        Pt luigi_last_pos = luigi_.last_grounded_pos();
+        luigi_.reset_position({luigi_last_pos.x, luigi_last_pos.y});
+    }
+
+    // Finish game if a character have run out of lives
+    if (mario_.lives() == 0 || luigi_.lives() == 0) {
+        endgame_ = true;
+        paused_ = true;
+        win_ = false;
+    }
+
+    // Query visible objects
+    pro2::Rect cam_rec = window.camera_rect();
+
+    // Increase the query rectangle to preload the objects at the bottom and top of the screen
+    pro2::Rect query_rec = {cam_rec.left, cam_rec.top - 160, cam_rec.right, cam_rec.bottom + 160};
+    platform_actualObj_ = platform_finder_.query(query_rec);
+    coin_actualObj_ = coin_finder_.query(query_rec);
+    spike_actualObj_ = spike_finder_.query(query_rec);
+    mushroom_actualObj_ = mushroom_finder_.query(query_rec);
+    goombas_actualObj_ = goombas_finder_.query(query_rec);
+    star_actualObj_ = star_finder_.query(query_rec);
+    
+    // Check collisions and update coins
+    for (auto it = coin_actualObj_.begin(); it != coin_actualObj_.end();) {
+        const Coin* c = *it;
+        if (objs_collision(mario_.rect(), c->get_rect()) ||
+            (objs_collision(luigi_.rect(), c->get_rect()) && !single_player_)) {
+            coin_finder_.remove(c);    
+            it = coin_actualObj_.erase(it);
+            num_coins_++;                   
+        } else {
+            Coin* non_const_coin = const_cast<Coin*>(c);
+            non_const_coin->update();
+            ++it;
+        }
+    }
+
+    // Check collisions and update mushrooms
+    for (auto it = mushroom_actualObj_.begin(); it != mushroom_actualObj_.end();) {
+        const Mushroom* m = *it;
+        if (objs_collision(mario_.rect(), m->get_rect())) {
+            mushroom_finder_.remove(m);    
+            it = mushroom_actualObj_.erase(it);
+            mario_.reset_lives();    
+            mario_.handle_mushroom();        
+        }
+        else if (objs_collision(luigi_.rect(), m->get_rect()) && !single_player_) {
+            mushroom_finder_.remove(m);    
+            it = mushroom_actualObj_.erase(it);
+            luigi_.reset_lives();      
+            luigi_.handle_mushroom();      
+        }
+        else {
+            Mushroom* non_const_coin = const_cast<Mushroom*>(m);
+            non_const_coin->update();
+            ++it;
+        }
+    }
+
+    // Check collisions with spikes
+    for (const Spike* s : spike_actualObj_) {
+        if (!immune_mario_ && objs_collision(mario_.rect(), s->get_rect())) {
+            immune_mario_ = true;
+            immunity_mario_until_ = (mario_.is_big()) ? frame_counter_ + 1.5*immunity_interval_ 
+                                    : frame_counter_ + immunity_interval_;
+            mario_.lose_life();
+        }
+
+        if (!immune_luigi_ && objs_collision(luigi_.rect(), s->get_rect()) && !single_player_) {
+            immune_luigi_ = true;
+            immunity_luigi_until_ = (luigi_.is_big()) ? frame_counter_ + 1.5*immunity_interval_ 
+                                    : frame_counter_ + immunity_interval_;
+            luigi_.lose_life();
+        }
+    }
+
+    // Check collisions and update goombas
+    for (auto it = goombas_actualObj_.begin(); it != goombas_actualObj_.end();) {
+        Goomba* goomba = const_cast<Goomba*>(*it);
+        const pro2::Rect goomba_rect = goomba->get_rect();
+        bool remove = false;
+
+        if (goomba->is_squashed() && goomba->get_deadtime() <= frame_counter_) {
+            goombas_finder_.remove(goomba);
+            it = goombas_actualObj_.erase(it);
+            continue;
+        }
+    
+        // Mario' collision
+        if (objs_collision(mario_.rect(), goomba_rect)) {
+            if (mario_.rect().bottom <= goomba_rect.top + 5) {
+                if (!goomba->is_squashed()) {
+                    goomba->hit_from_above(frame_counter_);
+                    mario_.set_grounded(true);
+                }
+            }
+            else if (!immune_mario_ && !goomba->is_squashed()) {
+                immune_mario_ = true;
+                immunity_mario_until_ = (mario_.is_big()) ? frame_counter_ + 1.5*immunity_interval_ 
+                                        : frame_counter_ + immunity_interval_;
+                mario_.lose_life();
+            }
+        }
+
+        // Luigi' collision
+        if (objs_collision(luigi_.rect(), goomba_rect) && !single_player_) {
+            if (luigi_.rect().bottom <= goomba_rect.top + 5) {
+                if (!goomba->is_squashed()) {
+                    goomba->hit_from_above(frame_counter_);
+                    luigi_.set_grounded(true);
+                }
+            } 
+            else if (!immune_luigi_ && !goomba->is_squashed()) {
+                immune_luigi_ = true;
+                immunity_luigi_until_ = (luigi_.is_big()) ? frame_counter_ + 1.5*immunity_interval_ 
+                                        : frame_counter_ + immunity_interval_;
+                luigi_.lose_life();
+            }
+        }
+    
+        goomba->update();
+        it++;
+    }
+
+    // Check collisions and update stars
+    for (auto it = star_actualObj_.begin(); it != star_actualObj_.end();) {
+        const Star* s = *it;
+        if (objs_collision(mario_.rect(), s->get_rect())) {
+            star_finder_.remove(s);    
+            it = star_actualObj_.erase(it);
+            mario_.handle_star();           
+        }
+        else if (objs_collision(luigi_.rect(), s->get_rect()) && !single_player_) {
+            star_finder_.remove(s);    
+            it = star_actualObj_.erase(it);
+            luigi_.handle_star();          
+        }
+        else {
+            Star* non_const_star = const_cast<Star*>(s);
+            non_const_star->update();
+            ++it;
+        }
+    }
+}

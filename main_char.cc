@@ -780,66 +780,65 @@ void MainChar::jump() {
 }
 
 
-// TODO
-// void MainChar::update(pro2::Window& window, std::set<const Platform*> platforms, std::set<const Spike*> spikes) {
-//     if (0 < growth_counter_) growth_counter_--;
-//     else if (0 < decrease_counter_) decrease_counter_--;
-//     else {
-//         if (0 < star_counter_) star_counter_--;
-//         else if (star_counter_ == 0) star_mode_ = false;
+void MainChar::update(pro2::Window& window, std::set<const Platform*> platforms, std::set<const Spike*> spikes) {
+    if (0 < growth_counter_) growth_counter_--;
+    else if (0 < decrease_counter_) decrease_counter_--;
+    else {
+        if (0 < star_counter_) star_counter_--;
+        else if (star_counter_ == 0) star_mode_ = false;
 
-//         last_pos_ = pos_;
+        last_pos_ = pos_;
     
-//         // Repositioning the character if out of bounds
-//         pro2::Rect char_rec = rect();
-//         pro2::Rect cam_rec = window.camera_rect();
-//         if (pos_.x < 5) pos_.x = 5;
+        // Repositioning the character if out of bounds
+        pro2::Rect char_rec = rect();
+        pro2::Rect cam_rec = window.camera_rect();
+        if (pos_.x < 5) pos_.x = 5;
 
-//         // Repositioning the secondary characters on the screen
-//         if (character_ != "mario") {
-//             // Horizontal position
-//             if (char_rec.right < cam_rec.left) pos_.x = cam_rec.left;
-//             else if (char_rec.left > cam_rec.right) pos_.x = cam_rec.right;
-//             else pos_.x = last_pos_.x;
-//         }
+        // Repositioning the secondary characters on the screen
+        if (character_ != "mario") {
+            // Horizontal position
+            if (char_rec.right < cam_rec.left) pos_.x = cam_rec.left;
+            else if (char_rec.left > cam_rec.right) pos_.x = cam_rec.right;
+            else pos_.x = last_pos_.x;
+        }
     
-//         if (window.is_key_down(jump_key_)) {
-//             jump();
-//         }
+        if (window.is_key_down(jump_key_)) {
+            jump();
+        }
     
-//         // Horizontal speed
-//         speed_.x = 0;
-//         if (window.is_key_down(left_key_)) speed_.x = (star_mode_) ? -5 : -4;
-//         else if (window.is_key_down(right_key_)) speed_.x = (star_mode_) ? 5 : 4;
+        // Horizontal speed
+        speed_.x = 0;
+        if (window.is_key_down(left_key_)) speed_.x = (star_mode_) ? -5 : -4;
+        else if (window.is_key_down(right_key_)) speed_.x = (star_mode_) ? 5 : 4;
     
-//         if (speed_.x != 0) {
-//             looking_left_ = speed_.x < 0;
-//             animation_counter_++;
-//         }
-//         else animation_counter_ = 0;
+        if (speed_.x != 0) {
+            looking_left_ = speed_.x < 0;
+            animation_counter_++;
+        }
+        else animation_counter_ = 0;
     
-//         if (pos_.x == last_pos_.x && pos_.y == last_pos_.y) apply_physics_();
-//         set_grounded(false);
+        if (pos_.x == last_pos_.x && pos_.y == last_pos_.y) apply_physics_();
+        set_grounded(false);
     
-//         // Check grounded on platforms 
-//         for (const Platform* platform : platforms) {
-//             if (!window.is_key_down(down_key_)) {
-//                 if (platform->has_crossed_floor_downwards(last_pos_, pos_)) {
-//                     set_grounded(true);
-//                     set_y(platform->top());
-//                 }
-//             }
-//         }
+        // Check grounded on platforms 
+        for (const Platform* platform : platforms) {
+            if (!window.is_key_down(down_key_)) {
+                if (platform->has_crossed_floor_downwards(last_pos_, pos_)) {
+                    set_grounded(true);
+                    set_y(platform->top());
+                }
+            }
+        }
     
-//         // Check grounded on spikes
-//         for (const Spike* spike : spikes) {
-//             if (spike->above_spike(last_pos_, pos_)) {
-//                 set_grounded(true);
-//                 set_y(spike->get_rect().top);
-//             }
-//         }
-//     }
-// }
+        // Check grounded on spikes
+        for (const Spike* spike : spikes) {
+            if (spike->above_spike(last_pos_, pos_)) {
+                set_grounded(true);
+                set_y(spike->get_rect().top);
+            }
+        }
+    }
+}
 
 
 pro2::Rect MainChar::rect() const {
