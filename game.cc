@@ -547,3 +547,41 @@ void Game::update_camera(pro2::Window& window) {
 
     window.move_camera({dx, dy});
 }
+
+void Game::update(pro2::Window& window) {
+    process_keys(window);
+
+    if (pregame_) {
+        // Update characters
+        if (!mario_.is_grounded() && !luigi_.is_grounded()) {
+            mario_.update(window, platform_actualObj_, spike_actualObj_);
+            luigi_.update(window, platform_actualObj_, spike_actualObj_);
+        }
+
+        // Query visible objects
+        pro2::Rect cam_rec = window.camera_rect();
+
+        // Increase the query rectangle to preload the objects at the bottom and top of the screen
+        pro2::Rect query_rec = {cam_rec.left, cam_rec.top - 160, cam_rec.right, cam_rec.bottom + 160};
+        platform_actualObj_ = platform_finder_.query(query_rec);
+        coin_actualObj_ = coin_finder_.query(query_rec);
+        spike_actualObj_ = spike_finder_.query(query_rec);
+        mushroom_actualObj_ = mushroom_finder_.query(query_rec);
+        goombas_actualObj_ = goombas_finder_.query(query_rec);
+        star_actualObj_ = star_finder_.query(query_rec);
+    }
+    else if (!paused_) {
+        update_objects(window);
+        update_camera(window);
+
+        // To update the background status
+        frame_counter_++;
+        if (frame_counter_ % day_night_interval_ == 0) {
+            day_time_ = !day_time_;
+        }
+
+        // To update the characters immunity
+        if (immune_mario_ && immunity_mario_until_ <= frame_counter_) immune_mario_ = false;
+        if (immune_luigi_ && immunity_luigi_until_ <= frame_counter_) immune_luigi_ = false;
+    }
+}
