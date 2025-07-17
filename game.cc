@@ -527,3 +527,23 @@ void Game::update_objects(pro2::Window& window) {
         }
     }
 }
+
+void Game::update_camera(pro2::Window& window) {
+    const Pt mario_pos = mario_.pos();
+    const Pt cam = window.camera_center();
+
+    int dx = 0, dy = 0;
+    const int limit_y = 140;
+
+    // Always follow Mario horizontally
+    if (mario_pos.x != cam.x && 240 < mario_pos.x) dx = mario_pos.x - cam.x;
+
+    // Follow vertically only if out of bounds
+    if ((mario_pos.y < cam.y - limit_y || mario_pos.y > cam.y + limit_y) && mario_.is_grounded()) {
+        dy = mario_pos.y - cam.y;
+        following_cam_ = true;
+    }
+    else if (following_cam_) following_cam_ = false;
+
+    window.move_camera({dx, dy});
+}
