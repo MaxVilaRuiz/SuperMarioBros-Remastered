@@ -585,3 +585,150 @@ void Game::update(pro2::Window& window) {
         if (immune_luigi_ && immunity_luigi_until_ <= frame_counter_) immune_luigi_ = false;
     }
 }
+
+void Game::paint(pro2::Window& window) {
+    // Paint the background and its objects
+    if (day_time_) window.clear(sky_blue);
+    else window.clear(sky_dark);
+
+    // Draw platforms
+    for (const Platform* p : platform_actualObj_) p->paint(window);
+
+    // Draw coins
+    for (const Coin* c : coin_actualObj_) c->paint(window);
+
+    // Draw spikes
+    for (const Spike* s : spike_actualObj_) s->paint(window);
+
+    // Draw mushrooms
+    for (const Mushroom* m : mushroom_actualObj_) m->paint(window);
+
+    // Draw goombas
+    for (const Goomba* g : goombas_actualObj_) g->paint(window);
+
+    // Draw stars
+    for (const Star* s : star_actualObj_) s->paint(window);
+
+    // Draw finish flab
+    paint_sprite(window, {4245, 20}, finish_flag_sprite_, false);
+
+    // Draw the star mode logo
+    const pro2::Rect cam_rect = window.camera_rect();
+    if (mario_.is_in_starmode() || (luigi_.is_in_starmode() && !single_player_)) {
+        Pt top_left = {cam_rect.left + 5, (single_player_) ? cam_rect.top + 36 : cam_rect.top + 51};
+
+        if (mario_.star_countdown() < 180 && luigi_.star_countdown() < 180) {
+            if ((frame_counter_ / 9) % 2 == 0) {
+                paint_sprite(window, top_left, Star::star_sprite_front, false);
+            }
+        }
+        else paint_sprite(window, top_left, Star::star_sprite_front, false);
+    }
+
+    // Draw the coin counter
+    Pt top_left = {cam_rect.left + 5, (single_player_) ? cam_rect.top + 20 : cam_rect.top + 35}; 
+    paint_sprite(window, top_left, Coin::coin_sprite_front, false);
+    pro2::Color text_color = (day_time_) ? pro2::black : pro2::white;
+    window.draw_txt({top_left.x + 17, top_left.y + 3}, std::to_string(num_coins_), text_color);
+
+    // Draw characters
+    mario_.paint(window, immune_mario_, frame_counter_);
+    if (!single_player_) luigi_.paint(window, immune_luigi_, frame_counter_);
+
+    // Draw characters' lives
+    mario_.paint_lives(window, "mario");
+    if (!single_player_) luigi_.paint_lives(window, "luigi");
+
+    // Pre-game screen
+    if (pregame_) {
+        // Draw title' rectangle
+        Pt top_center = {window.camera_center().x - 60, window.camera_center().y - 120};
+        paint_rect(window, {top_center.x, top_center.y + 25, top_center.x + 90, 
+                            top_center.y}, pro2::mid_blue);
+
+        // Draw title
+        int space = 7 , i = 0, j = 0;
+        std::string s;
+        for (char c : "MARIO PRO2") {
+            s = c;
+            window.draw_txt({top_center.x + 10 + space*j, top_center.y + 10}, s, color_vec_[i]);
+            if (i == 3) i = 0;
+            else i++;
+            j++;
+        }
+    
+        // Draw options' rectangle
+        paint_rect(window, {top_center.x - 20, top_center.y + 80, top_center.x + 110, 
+            top_center.y + 25}, pro2::soft_blue);
+
+        // Draw options
+        i = 0;
+        for (std::string s : pregame_options_) {
+            window.draw_txt({top_center.x + 15, top_center.y + 40 + 20*i}, s, white);
+            i++;
+        }
+
+        // Draw options pointer
+        int diff = (*pregame_options_it_ == "1 PLAYER GAME") ? 39 : 59;
+        paint_sprite(window, {top_center.x - 5, top_center.y + diff}, option_pointer_sprite_, false);
+    }
+
+    // Draw instructions for pre-game & paused screen
+    if (paused_ || pregame_ || endgame_) {
+        // Draw instructions' rectangle
+        paint_rect(window, {cam_rect.right - 135, cam_rect.top + 92, cam_rect.right - 5, 
+                            cam_rect.top + 5}, pro2::soft_blue);
+
+        // Draw instructions
+        int i = 0, j = 0;
+        Pt top_right = {cam_rect.right - 63, cam_rect.top + 15};
+        int buttons = top_right.x - 50;
+        for (std::pair<std::string, std::vector<std::string>> p : instructions_) {
+            window.draw_txt({top_right.x, top_right.y + 10*i}, p.first, white);
+            j = 0;
+            for (std::string s : p.second) {
+                window.draw_txt({buttons - 15*j, top_right.y + 10*i}, s, white);
+                j++;
+            }
+            i++;
+        }
+    }
+
+    // Paused screen
+    if (paused_ && !pregame_ && !endgame_) {
+        // Draw paused' rectangle
+        paint_rect(window, {cam_rect.left + 218, cam_rect.top + 32, cam_rect.left + 263, 
+            cam_rect.top + 15}, pro2::soft_blue);
+
+        // Draw paused
+        window.draw_txt({cam_rect.left + 223, cam_rect.top + 20}, "PAUSED", white);
+    }
+
+    // End-game screen
+    if (endgame_) {
+        // Draw title' rectangle
+        Pt top_center = {window.camera_center().x - 60, window.camera_center().y - 120};
+        paint_rect(window, {top_center.x, top_center.y + 25, top_center.x + 90, 
+                            top_center.y}, pro2::mid_blue);
+
+        // Draw title
+        if (win_) window.draw_txt({top_center.x + 24, top_center.y + 10}, "VICTORY", green);
+        else window.draw_txt({top_center.x + 19, top_center.y + 10}, "GAME OVER", red);
+
+    
+        // Draw options' rectangle
+        paint_rect(window, {top_center.x - 20, top_center.y + 101, top_center.x + 110, 
+            top_center.y + 25}, pro2::soft_blue);
+
+        // Draw options
+        int i = 0;
+        for (std::string s : endgame_options_) {
+            window.draw_txt({top_center.x + 20, top_center.y + 40 + 20*i}, s, white);
+            i++;
+        }
+
+        // Draw options pointer
+        int diff = (*endgame_options_it_ == "TRY AGAIN") ? 39 : (*endgame_options_it_ == "MENU") ? 59 : 79;
+        paint_sprite(window, {top_center.x, top_center.y + diff}, option_pointer_sprite_, false);
+    }
+}
