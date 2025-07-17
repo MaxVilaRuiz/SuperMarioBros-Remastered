@@ -94,4 +94,17 @@ class Game {
     // Screen size
     int width_;
     int height_;
+
+    void process_keys(pro2::Window& window);        // Handle input
+    void update_objects(pro2::Window& window);      // Update game logic
+    void update_camera(pro2::Window& window);       // Adjust camera
+
+ public:
+    Game(int width, int height);                    // Constructor
+
+    void update(pro2::Window& window);              // Per-frame update
+
+    void paint(pro2::Window& window);               // Draw game
+
+    bool is_finished() const { return finished_; }
 };
