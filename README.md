@@ -62,13 +62,13 @@ The game includes different gameplay phases: pre-game, paused, in-game, and endg
 
 ### Build & Run
 ```bash
-$ git clone ...
+$ git clone https://github.com/MaxVilaRuiz/SuperMarioBros-Remastered.git
 $ cd SuperMarioBros-Remastered
 $ make
 $ ./mario_pro2
 ```
 
-## 🎯 Controls
+## Controls
 
 | Action      | Player 1 | Player 2 |
 |-------------|----------|----------|
